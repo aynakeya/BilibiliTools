@@ -4,6 +4,9 @@ b站收藏夹下载器<br>
 Make sure you have both python and you-get<br>
 请确保安装了python3 和 you-get<br>
 <br>
+Make sure you Favourite list is public<br>
+请确保你的收藏夹是公开的<br>
+<br>
 enter the url with '/' in the end (e.g enter your fav: https://space.bilibili.com/10003632/#!/favlist?fid=20677228/)<br>
 请在地址的最后面加上'/'( 例子：enter your fav: https://space.bilibili.com/10003632/#!/favlist?fid=20677228/)<br>
 <br>
