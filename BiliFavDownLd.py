@@ -19,6 +19,9 @@ removechr = {"/": "-",
              "?": "-",
              "<": "-",
              ">": "-",
+             "|": "-",
+             "：" : "-",
+             "\"" : "-"
             }
 specialchr = {"\\u0026": "&",
               "\\u003c" : "-",
@@ -61,7 +64,7 @@ def GetData(pn) :
     ed = wholeHTML.find(",",st)-1
     avspic.append(wholeHTML[st:ed:])
     st = wholeHTML.find("title",ed)+8
-    ed = wholeHTML.find(",",st)-1
+    ed = wholeHTML.find(",\"",st)-1
     avstitle.append(wholeHTML[st:ed:])
     return "Finsh"
 
