@@ -8,10 +8,10 @@ avs = ["AV"]
 avstitle = ["Title"]
 avspic = ["Pic"]
 preurl = ""
-videosave = ""
-picsave =  ""
-videourl = "https://www.bilibili.com/video/av"
 txtsave = ""
+picsave =  ""
+videosave = ""
+videourl = "https://www.bilibili.com/video/av"
 removechr = {"/": "-",
              "\\": "-",
              ":": "-",
@@ -33,6 +33,8 @@ number = int(input("enter your number: "))
 txtsave = input("enter the path you want to save the data(full path with document name): ")
 picsave = input("enter the path you want to save the pictures(full path): ")
 videosave = input("enter the path you want to save the videos(full path): ")
+
+
 
 def rmvchr(s) :
     if s in removechr :
@@ -80,8 +82,9 @@ else :
 downldpic = input("Download Pictures? y/n ")
 if downldpic == "y" :
     for i in range(1,number+1,1) :
-        avstitle[i] = "'"+reduce(lambda x,y : x+y,map(rmvchr,avstitle[i]))+"'"
-        os.system("you-get --output-dir %s --output-filename %s %s" % (picsave,avstitle[i],avspic[i]))
+        avstitle[i] = reduce(lambda x,y : x+y,map(rmvchr,avstitle[i]))
+        os.system("you-get --output-dir %s --output-filename %s %s" % (picsave,avs[i],avspic[i]))
+        os.rename(picsave+avs[i]+avspic[i][-4::],picsave+avstitle[i]+avspic[i][-4::])
     print("Finish")
 else :
     print("Ok")
