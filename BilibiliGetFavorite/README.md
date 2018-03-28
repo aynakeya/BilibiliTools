@@ -21,6 +21,6 @@ enter the path you want to save the data(full path with document name):<br>
 <br>
 enjoy :)<br>
 <br>
-Dec.4.2017 : Upload.<br>
+Dec.4.2017 : Fisrt Upload.<br>
 Dec.5.2017 : Add Pictures DownLoad<br>
 
