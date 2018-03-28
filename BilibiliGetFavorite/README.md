@@ -23,4 +23,4 @@ enjoy :)<br>
 <br>
 Dec.4.2017 : Fisrt Upload.<br>
 Dec.5.2017 : Add Pictures DownLoad<br>
-
+Mar.28.2018 : Rewrite getdata() by using json<br>

@@ -50,15 +50,10 @@ def rplchr(s):
 def getdata(pn) :
     wholeurl = preurl + str(pn)
     wholeHTML = request.urlopen(wholeurl).read().decode("utf-8")
-    st = wholeHTML.find("aid",0)+5
-    ed = wholeHTML.find(",",st)
-    avs.append(wholeHTML[st:ed:])
-    st = wholeHTML.find("pic",ed)+6
-    ed = wholeHTML.find(",",st)-1
-    avspic.append(wholeHTML[st:ed:])
-    st = wholeHTML.find("title",ed)+8
-    ed = wholeHTML.find(",\"",st)-1
-    avstitle.append(wholeHTML[st:ed:])
+    alldata = json.loads(wholeHTML)
+    avs.append(str(alldata["data"]["archives"][0]["aid"]))
+    avspic.append(str(alldata["data"]["archives"][0]["pic"]))
+    avstitle.append(str(alldata["data"]["archives"][0]["title"]))
     return "Finsh"
 
 
