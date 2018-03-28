@@ -8,6 +8,7 @@ import time
 {"code":10003,"message":"不存在该稿件","ttl":1} 不存在该稿件
 {"code":-503,"message":"调用速度过快","ttl":1} 调用速度过快
 {"code":-404,"message":"啥都木有","ttl":1} 啥都没有
+{"code":-101,"message":"账号未登录","ttl":1} 账号未登录
 '''
 
 codes = {'0':(0,'收藏成功'),
@@ -15,7 +16,8 @@ codes = {'0':(0,'收藏成功'),
          '10003':(1,"不存在该稿件"),
          '-404':(1,"啥都木有"),
          '-503':(2,"调用速度过快"),
-         '-111':(-1,"csrf 校验失败")}
+         '-111':(-1,"csrf 校验失败"),
+         '-101':(-1,"账号未登录,可能是cookie过期")}
 
 raw_cookie = input("Enter cookie: ")
 bilicookie = {}
@@ -54,13 +56,13 @@ if __name__=="__main__":
         code = msg[msg.find('"code":')+7:msg.find(',"message"'):]
         '''
         code, msg = addfav(av)
-        if len(code) > 10 or len(code)<1:
-            while len(code) > 10 or len(code)<1:
+        if len(code) >6 or len(code) < 1:
+            while len(code) >10 or len(code) < 1:
                 print("Get Code Error")
                 print("Sleep for 3 sec")
                 time.sleep(3)
                 code, msg = addfav(av)
-        if codes[code] != False:
+        if code in codes:
             pattern, msg = codes[code]
             print("尝试第%s个，添加视频av%s到收藏夹%s---返回信息:%s(code:%s)" % (aid.index(av)+1,av, fid, msg, code))
             if pattern == 1:
@@ -74,6 +76,7 @@ if __name__=="__main__":
                     print("重试第%s个，添加视频av%s到收藏夹%s---返回信息:%s(code:%s)" % (aid.index(av)+1,av, fid, msg, code))
             if pattern == -1:
                 print("please re try!")
+                break
         else:
             print("Unexceppt Error: %s:" % msg)
 
