@@ -15,8 +15,7 @@ codes = {'0':(0,'收藏成功'),
          '10003':(1,"不存在该稿件"),
          '-404':(1,"啥都木有"),
          '-503':(2,"调用速度过快"),
-         '-111':(-1,"csrf 校验失败")
-                }
+         '-111':(-1,"csrf 校验失败")}
 
 raw_cookie = input("Enter cookie: ")
 bilicookie = {}
@@ -55,8 +54,8 @@ if __name__=="__main__":
         code = msg[msg.find('"code":')+7:msg.find(',"message"'):]
         '''
         code, msg = addfav(av)
-        if len(code) > 10:
-            while len(code) > 10:
+        if len(code) > 10 or len(code)<1:
+            while len(code) > 10 or len(code)<1:
                 print("Get Code Error")
                 print("Sleep for 3 sec")
                 time.sleep(3)
