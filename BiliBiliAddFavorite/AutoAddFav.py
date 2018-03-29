@@ -1,5 +1,6 @@
 import requests
 import time
+import json
 
 '''
 {"code":0,"message":"0","ttl":1} 收藏成功
@@ -29,7 +30,8 @@ for line in raw_cookie.split(';'):
 csrf = bilicookie['bili_jct']
 fid = input("Enter fid: ")
 aid = input("Enter avs: ").split(" ")
-print(aid)
+
+print("共%s个视频，开始尝试添加。" % len(aid))
 
 url = 'https://api.bilibili.com/x/v2/fav/video/add'
 headers = {'User-agent':'Mozilla/5.0 (Windows NT 6.1; WOW64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/60.0.3112.113 Safari/537.36',
@@ -42,8 +44,8 @@ data = {'aid': '','fid': fid,'jsonp': 'jsonp','csrf': csrf}
 def addfav(av):
     data['aid'] = av
     resp = requests.post(url, headers=headers, cookies=bilicookie, data=data)
-    msg = resp.content.decode('utf-8')
-    code = msg[msg.find('"code":') + 7:msg.find(',"message"'):]
+    msg = json.loads(resp.content.decode('utf-8'))
+    code = str(msg["code"])
     return code,msg
 
 if __name__=="__main__":

@@ -21,5 +21,6 @@ please split av with space like==>19185738 19055931 12885269 19187388<br>
 enjoy :)<br>
 <br>
 March.28.2018 : Fisrt Upload.<br>
+March.29.2018 : Fix Bugs and rewrite addfav() using json<br>
 
 
