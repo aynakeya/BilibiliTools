@@ -1,4 +1,5 @@
 from urllib import request
+import json
 import os
 from functools import reduce
 
@@ -84,7 +85,7 @@ if __name__=="__main__":
     if downldpic == "y":
         for i in range(1, number + 1, 1):
             avstitle[i] = reduce(lambda x, y: x + y, map(rmvchr, avstitle[i]))
-            os.system("you-get --output-dir %s --output-filename %s %s" % (picsave, avs[i], avspic[i]))
+            os.system("lulu --output-dir %s --output-filename %s %s" % (picsave, avs[i], avspic[i]))
             os.rename(picsave + avs[i] + avspic[i][-4::], picsave + avstitle[i] + avspic[i][-4::])
         print("Finish")
     else:
@@ -93,7 +94,7 @@ if __name__=="__main__":
     downld = input("Download Video? y/n ")
     if downld == "y":
         for i in range(1, number + 1, 1):
-            os.system("you-get --format=flv -o %s %s" % (videosave, videourl + avs[i]))
+            os.system("lulu --format=flv -o %s %s" % (videosave, videourl + avs[i]))
         print("Finish")
     else:
         print("Ok")

@@ -1,8 +1,8 @@
 Bilibili Favourite DownLoader<br>
 b站收藏夹下载器<br>
 <br>
-Make sure you have both python and you-get<br>
-请确保安装了python3 和 you-get<br>
+Make sure you have both python and lulu(or you-get if it works XD)<br>
+请确保安装了python3 和 lulu(或you-get 如果能用的话)<br>
 <br>
 Make sure you Favourite list is public<br>
 请确保你的收藏夹是公开的<br>
@@ -24,3 +24,4 @@ enjoy :)<br>
 Dec.4.2017 : Fisrt Upload.<br>
 Dec.5.2017 : Add Pictures DownLoad<br>
 Mar.28.2018 : Rewrite getdata() by using json<br>
+Apr.3.2018 : Usem lulu instead of you-get<br>
