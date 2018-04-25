@@ -94,7 +94,7 @@ if __name__=="__main__":
     downld = input("Download Video? y/n ")
     if downld == "y":
         for i in range(1, number + 1, 1):
-            os.system("lulu --format=flv -o %s %s" % (videosave, videourl + avs[i]))
+            os.system("lulu -o %s %s" % (videosave, videourl + avs[i]))
         print("Finish")
     else:
         print("Ok")

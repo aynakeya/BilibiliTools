@@ -1,7 +1,7 @@
 # -*- coding:utf-8 -*-
 
 from functools import reduce
-
+import time
 def parsetitle(title):
 
     def getkey(singerlist):
@@ -38,10 +38,13 @@ def parsetitle(title):
 
     for singer in vsingerdict:
         if singer in title:
+            if singerskey & (1 << (str(bin(vsingerdict[singer])).count('0')-1)):
+                continue
             singerskey += vsingerdict[singer]
 
     if singerskey == 0:
         return title
+
 
     vsingers = vsingersdict[str(singerskey)]
     titlebackup = title

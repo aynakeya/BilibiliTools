@@ -11,3 +11,4 @@ BTW 丢出来的格式可以自己改哟，去代码里改一下就行了啦<br>
 enjoy :)<br>
 <br>
 April.4.2018 : Fisrt Upload.<br>
+April.4.2018 : Fix Bug about repeat name.<br>
