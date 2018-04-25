@@ -22,5 +22,6 @@ enjoy :)<br>
 <br>
 March.28.2018 : Fisrt Upload.<br>
 March.29.2018 : Fix Bugs and rewrite addfav() using json<br>
+March.29.2018 : Fix Bugs(Bilibili changed some response)<br>
 
 

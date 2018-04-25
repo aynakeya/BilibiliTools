@@ -44,7 +44,11 @@ data = {'aid': '','fid': fid,'jsonp': 'jsonp','csrf': csrf}
 def addfav(av):
     data['aid'] = av
     resp = requests.post(url, headers=headers, cookies=bilicookie, data=data)
-    msg = json.loads(resp.content.decode('utf-8'))
+    try:
+        msg = json.loads(resp.content.decode('utf-8'))
+    except:
+        print('Load Json Failed')
+        return "",""
     code = str(msg["code"])
     return code,msg
 
@@ -86,6 +90,7 @@ if __name__=="__main__":
         print("不存在的av号:\n%s" % avnotexsit)
 
     print("Finished")
+
 
 '''
 resp = requests.post(url,headers = headers,cookies = bilicookie,data=data)
