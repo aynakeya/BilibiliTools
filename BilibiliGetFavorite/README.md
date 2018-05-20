@@ -24,4 +24,5 @@ enjoy :)<br>
 Dec.4.2017 : Fisrt Upload.<br>
 Dec.5.2017 : Add Pictures DownLoad<br>
 Mar.28.2018 : Rewrite getdata() by using json<br>
-Apr.3.2018 : Usem lulu instead of you-get<br>
+Apr.3.2018 : Use lulu instead of you-get<br>
+May.20.2018 : Rewrite<br>

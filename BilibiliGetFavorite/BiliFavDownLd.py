@@ -1,18 +1,7 @@
 from urllib import request
-import json
-import os
 from functools import reduce
+import json,time,os
 
-vmid = ""
-fid = ""
-avs = ["AV"]
-avstitle = ["Title"]
-avspic = ["Pic"]
-preurl = ""
-txtsave = ""
-picsave =  ""
-videosave = ""
-videourl = "https://www.bilibili.com/video/av"
 removechr = {"/": "-",
              "\\": "-",
              ":": "-",
@@ -23,80 +12,130 @@ removechr = {"/": "-",
              "|": "-",
              "：" : "-",
              "\"" : "-",
-             "→" : "-"
+             "→" : "-",
+             " " : "' '",
+             "&" : "-",
+             "'" : "\"'\"",
             }
 specialchr = {"\\u0026": "&",
-              "\\u003c" : "-",
-              "\\u003e" : "-"}
-specialchrindex = ["\\u0026","\\u003c","\\u003e"]
+              "\\u003c" : "<",
+              "\\u003e" : ">"}
 
 def rmvchr(s) :
-    if s in removechr :
+    if s in removechr:
         return removechr[s]
-    else :
+    else:
         return s
 
-
 def rplchr(s):
-    a = True
-    while a :
-        a = False
-        for i in range(0,len(specialchrindex),1) :
-            if specialchrindex[i] in s :
-                s = s[:s.find(specialchrindex[i],0):]+specialchr[specialchrindex[i]]+s[s.find(specialchrindex[i],0)+6::]
-                a = True
+    for key, value in specialchr.items():
+        s.replace(key,value)
     return s
 
 
-def getdata(pn) :
-    wholeurl = preurl + str(pn)
-    wholeHTML = request.urlopen(wholeurl).read().decode("utf-8")
-    alldata = json.loads(wholeHTML)
-    avs.append(str(alldata["data"]["archives"][0]["aid"]))
-    avspic.append(str(alldata["data"]["archives"][0]["pic"]))
-    avstitle.append(str(alldata["data"]["archives"][0]["title"]))
-    return "Finsh"
+def getdata(number):
 
+    def tryget():
+        try:
+            wholeHTML = request.urlopen(wholeurl).read().decode("utf-8")
+            jsondata = json.loads(wholeHTML)
+        except:
+            print("获取失败，暂停3秒")
+            print("获取数据: 第%s个==>" % pn, end="")
+            time.sleep(3)
+            while True:
+                try:
+                    wholeHTML = request.urlopen(wholeurl).read().decode("utf-8")
+                    jsondata = json.loads(wholeHTML)
+                    break
+                except:
+                    print("获取失败，暂停3秒")
+                    print("获取数据: 第%s个==>" % pn, end="")
+                    time.sleep(3)
+        return jsondata
 
-if __name__=="__main__":
-    urlin = input("enter your fav: ")
-    vmid = urlin[urlin.find("com", 0) + 4:urlin.find("/#", 0):]
-    fid = urlin[urlin.find("fid", 0) + 4:-1:]
-    preurl = "https://api.bilibili.com/x/v2/fav/video?vmid=" + vmid + "&ps=1&fid=" + fid + "&pn="
-    number = int(input("enter your number: "))
-    txtsave = input("enter the path you want to save the data(full path with document name): ")
-    picsave = input("enter the path you want to save the pictures(full path): ")
-    videosave = input("enter the path you want to save the videos(full path): ")
+    data = []
+    for pn in range(number):
+        pn += 1
+        print("获取数据: 第%s个==>" % pn,end="")
+        #格式化api
+        wholeurl = apiurl % pn
+        jsondata = tryget()
+        code = jsondata["code"]
+        if code == 0:
+            print("获取成功",end="")
+        else:
+            print("返回值:%s,返回信息:%s" % (code, jsondata["message"]))
+            while code != 0:
+                print("获取数据: 第%s个==>" % pn, end="")
+                jsondata = tryget()
+                code = jsondata["code"]
+            print("获取成功",end="")
 
-    for i in range(1, number + 1, 1):
-        print(str(i) + " " + getdata(i))
+        data.append({"aid":str(jsondata["data"]["archives"][0]["aid"]),
+                     "title":str(jsondata["data"]["archives"][0]["title"]),
+                     "pic":str(jsondata["data"]["archives"][0]["pic"])})
+        print("------(AV号:%s,标题:%s)" % (data[pn-1]["aid"], data[pn-1]["title"]))
+    return data
 
+def download_by_aria2(data):
+    #plz help me
+    #i don't know how to do that
+    pass
+
+def download_by_lulu(data, route):
+
+    videourl = "https://www.bilibili.com/video/av"
+    datasvrt,imgsvrt,videosvrt = route
     expt = input("Export Data? y/n ")
     if expt == "y":
-        with open(txtsave, "w", encoding="utf-8") as exfile:
-            for i in range(0, number + 1, 1):
-                avstitle[i] = rplchr(avstitle[i])
-                exfile.write((avs[i] + " " + avstitle[i] + " " + avspic[i] + "\n"))
-        print("Finish")
+        with open(datasvrt, "w", encoding="utf-8") as exfile:
+            for video in data:
+                # 标题使用替换特殊字符后的标题
+                exfile.write((video["aid"] + "---" + rplchr(video["title"]) + "---" + video["pic"] + "\n"))
+        print("Finish export data")
     else:
-        print("OK")
+        print("Skip")
 
-    downldpic = input("Download Pictures? y/n ")
+    downldpic = input("Download Covers? y/n ")
     if downldpic == "y":
-        for i in range(1, number + 1, 1):
-            avstitle[i] = reduce(lambda x, y: x + y, map(rmvchr, avstitle[i]))
-            os.system("lulu --output-dir %s --output-filename %s %s" % (picsave, avs[i], avspic[i]))
-            os.rename(picsave + avs[i] + avspic[i][-4::], picsave + avstitle[i] + avspic[i][-4::])
-        print("Finish")
+        for video in data:
+            # 使用代替特殊字符
+            otptname = reduce(lambda x, y: x + y, map(rmvchr, video["title"]))
+            os.system("lulu --output-dir %s --output-filename %s %s" % (imgsvrt, otptname, video["pic"]))
+        print("Finish download covers")
     else:
-        print("Ok")
+        print("Skip")
 
     downld = input("Download Video? y/n ")
     if downld == "y":
-        for i in range(1, number + 1, 1):
-            os.system("lulu -o %s %s" % (videosave, videourl + avs[i]))
-        print("Finish")
+        for video in data:
+            # 使用代替特殊字符
+            otptname = reduce(lambda x, y: x + y, map(rmvchr, video["title"]))
+            os.system("lulu --output-dir %s --output-filename %s %s" % (videosvrt, otptname, videourl+video["aid"]))
+        print("Finish download video")
     else:
-        print("Ok")
+        print("Skip")
 
-    print("All Finish")
+    return "finish"
+
+if __name__=="__main__":
+    #favlink = input("Enter Favorite Folder Link")
+    favlink = "https://space.bilibili.com/10003632/#/favlist?fid=20677228/"
+    #如果最后有/则去掉/
+    if favlink[-1] == "/":
+        favlink = favlink[:-1:]
+    #获取vmid
+    vmid = favlink[favlink.find("com", 0) + 4:favlink.find("/#", 0):]
+    #获取fid
+    fid = favlink[favlink.find("fid", 0) + 4::]
+    #api链接
+    apiurl = "https://api.bilibili.com/x/v2/fav/video?vmid=%s&ps=1&fid=%s&pn=%s" % (vmid, fid, "%s")
+    #获取需要个数
+    number = int(input("enter your number: "))
+    datasvrt = input("Enter data save route(full)")
+    imgsvrt = input("Enter image save route(full)")
+    videosvrt = input("Enter video save route(full)")
+
+    data = getdata(number)
+    download_by_lulu(data,(datasvrt,imgsvrt,videosvrt))
