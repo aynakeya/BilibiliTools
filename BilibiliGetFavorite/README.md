@@ -7,8 +7,8 @@ Make sure you have both python and lulu(or you-get if it works XD)<br>
 Make sure you Favourite list is public<br>
 请确保你的收藏夹是公开的<br>
 <br>
-enter the url with '/' in the end (e.g enter your fav: https://space.bilibili.com/10003632/#!/favlist?fid=20677228/)<br>
-请在地址的最后面加上'/'( 例子：enter your fav: https://space.bilibili.com/10003632/#!/favlist?fid=20677228/)<br>
+~~enter the url with '/' in the end (e.g enter your fav: https://space.bilibili.com/10003632/#!/favlist?fid=20677228/)~~<br>
+~~请在地址的最后面加上'/'( 例子：enter your fav: https://space.bilibili.com/10003632/#!/favlist?fid=20677228/)~~<br>
 <br>
 enter the number of video you want download(from newest)(e.g enter your number: 503 ==> stand for download newest 503 videos)<br>
 输入想要下载的视频数量(从最新的一个开始计算)(例子：enter your number: 503 ==> 下载前503个视频)<br>
