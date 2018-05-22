@@ -1,6 +1,7 @@
 from urllib import request
 from functools import reduce
 import json,time,os
+from multiprocessing import Pool
 
 removechr = {"/": "-",
              "\\": "-",
@@ -78,12 +79,15 @@ def getdata(number):
         print("------(AV号:%s,标题:%s)" % (data[pn-1]["aid"], data[pn-1]["title"]))
     return data
 
+def dl(method,svrt,otptname,url):
+    os.system("%s --output-dir %s --output-filename %s %s" % (method, svrt, otptname, url))
+
 def download_by_aria2(data):
     #plz help me
     #i don't know how to do that
     pass
 
-def download_by_lulu(data, route):
+def download(data, route, method = "you-get"):
 
     videourl = "https://www.bilibili.com/video/av"
     datasvrt,imgsvrt,videosvrt = route
@@ -102,7 +106,7 @@ def download_by_lulu(data, route):
         for video in data:
             # 使用代替特殊字符
             otptname = reduce(lambda x, y: x + y, map(rmvchr, video["title"]))
-            os.system("lulu --output-dir %s --output-filename %s %s" % (imgsvrt, otptname, video["pic"]))
+            os.system("%s --output-dir %s --output-filename %s %s" % (method, imgsvrt, otptname, video["pic"]))
         print("Finish download covers")
     else:
         print("Skip")
@@ -111,8 +115,51 @@ def download_by_lulu(data, route):
     if downld == "y":
         for video in data:
             # 使用代替特殊字符
+            otptname = parsetitle(reduce(lambda x, y: x + y, map(rmvchr, video["title"])))
+            os.system("%s --output-dir %s --output-filename %s %s" % (method, videosvrt, otptname, videourl+video["aid"]))
+        print("Finish download video")
+    else:
+        print("Skip")
+
+    return "finish"
+
+
+def download_multi(data, route, method = "you-get"):
+
+    videourl = "https://www.bilibili.com/video/av"
+    datasvrt,imgsvrt,videosvrt = route
+    expt = input("Export Data? y/n ")
+    if expt == "y":
+        with open(datasvrt, "w", encoding="utf-8") as exfile:
+            for video in data:
+                # 标题使用替换特殊字符后的标题
+                exfile.write((video["aid"] + "---" + rplchr(video["title"]) + "---" + video["pic"] + "\n"))
+        print("Finish export data")
+    else:
+        print("Skip")
+
+    downldpic = input("Download Covers? y/n ")
+    if downldpic == "y":
+        p = Pool()
+        for video in data:
+            # 使用代替特殊字符
             otptname = reduce(lambda x, y: x + y, map(rmvchr, video["title"]))
-            os.system("lulu --output-dir %s --output-filename %s %s" % (videosvrt, otptname, videourl+video["aid"]))
+            p.apply_async(dl,(method, imgsvrt, otptname, video["pic"]))
+        p.close()
+        p.join()
+        print("Finish download covers")
+    else:
+        print("Skip")
+
+    downld = input("Download Video? y/n ")
+    if downld == "y":
+        p = Pool()
+        for video in data:
+            # 使用代替特殊字符
+            otptname = parsetitle(reduce(lambda x, y: x + y, map(rmvchr, video["title"])))
+            p.apply_async(dl, (method, videosvrt, otptname, videourl+video["aid"]))
+        p.close()
+        p.join()
         print("Finish download video")
     else:
         print("Skip")
@@ -138,4 +185,4 @@ if __name__=="__main__":
     videosvrt = input("Enter video save route(full)")
 
     data = getdata(number)
-    download_by_lulu(data,(datasvrt,imgsvrt,videosvrt))
+    download_multi(data,(datasvrt,imgsvrt,videosvrt))
