@@ -1,9 +1,9 @@
 from urllib import request
-from functools import reduce
-import json,time,os
+import json,time,os,platform
 from multiprocessing import Pool
+from VocaloidParse import parsetitle
 
-removechr = {"/": "-",
+rplchrdict_unix = {"/": "-",
              "\\": "-",
              ":": "-",
              "*": "-",
@@ -18,19 +18,39 @@ removechr = {"/": "-",
              "&" : "-",
              "'" : "\"'\"",
             }
-specialchr = {"\\u0026": "&",
+
+rplchrdict_windows = {"/": "-",
+             "\\": "-",
+             ":": "-",
+             "*": "-",
+             "?": "-",
+             "<": "-",
+             ">": "-",
+             "|": "-",
+             "：" : "-",
+             "\"" : "-",
+             "→" : "-",
+             "&" : "-",
+            }
+
+unicdchr = {"\\u0026": "&",
               "\\u003c" : "<",
               "\\u003e" : ">"}
 
-def rmvchr(s) :
-    if s in removechr:
-        return removechr[s]
+def rplchr(s,opsys) :
+    if opsys == "Windows":
+        chrdict = rplchrdict_windows
     else:
-        return s
+        chrdict = rplchrdict_unix
+    for key, value in chrdict.items():
+        s = s.replace(key, value)
+    if s[0] == "-":
+        s = "rmv"+s
+    return s
 
-def rplchr(s):
-    for key, value in specialchr.items():
-        s.replace(key,value)
+def unicdefmt(s):
+    for key, value in unicdchr.items():
+        s = s.replace(key, value)
     return s
 
 
@@ -73,14 +93,18 @@ def getdata(number):
                 code = jsondata["code"]
             print("获取成功",end="")
 
+        #对于标题，将特殊的Unicode\u 替换成正常字符串.
         data.append({"aid":str(jsondata["data"]["archives"][0]["aid"]),
-                     "title":str(jsondata["data"]["archives"][0]["title"]),
+                     "title":unicdefmt(str(jsondata["data"]["archives"][0]["title"])),
                      "pic":str(jsondata["data"]["archives"][0]["pic"])})
         print("------(AV号:%s,标题:%s)" % (data[pn-1]["aid"], data[pn-1]["title"]))
     return data
 
-def dl(method,svrt,otptname,url):
-    os.system("%s --output-dir %s --output-filename %s %s" % (method, svrt, otptname, url))
+def dl(opsys,method,svrt,otptname,url):
+    if opsys == "Windows":
+        os.system("%s --output-dir \"%s\" --output-filename \"%s\" %s" % (method, svrt, otptname, url))
+    else:
+        os.system("%s --output-dir %s --output-filename %s %s" % (method, svrt, otptname, url))
 
 def download_by_aria2(data):
     #plz help me
@@ -95,8 +119,7 @@ def download(data, route, method = "you-get"):
     if expt == "y":
         with open(datasvrt, "w", encoding="utf-8") as exfile:
             for video in data:
-                # 标题使用替换特殊字符后的标题
-                exfile.write((video["aid"] + "---" + rplchr(video["title"]) + "---" + video["pic"] + "\n"))
+                exfile.write((video["aid"] + "---" + video["title"] + "---" + video["pic"] + "\n"))
         print("Finish export data")
     else:
         print("Skip")
@@ -104,9 +127,9 @@ def download(data, route, method = "you-get"):
     downldpic = input("Download Covers? y/n ")
     if downldpic == "y":
         for video in data:
-            # 使用代替特殊字符
-            otptname = reduce(lambda x, y: x + y, map(rmvchr, video["title"]))
-            os.system("%s --output-dir %s --output-filename %s %s" % (method, imgsvrt, otptname, video["pic"]))
+            # 使用代替特殊字符后的标题
+            otptname = rplchr(video["title"],opsys)
+            dl(opsys, method, imgsvrt, otptname, video["pic"])
         print("Finish download covers")
     else:
         print("Skip")
@@ -114,9 +137,9 @@ def download(data, route, method = "you-get"):
     downld = input("Download Video? y/n ")
     if downld == "y":
         for video in data:
-            # 使用代替特殊字符
-            otptname = parsetitle(reduce(lambda x, y: x + y, map(rmvchr, video["title"])))
-            os.system("%s --output-dir %s --output-filename %s %s" % (method, videosvrt, otptname, videourl+video["aid"]))
+            # 使用代替特殊字符后的标题
+            otptname = rplchr(video["title"], opsys)
+            dl(opsys, method, videosvrt, otptname, videourl + video["aid"])
         print("Finish download video")
     else:
         print("Skip")
@@ -124,7 +147,7 @@ def download(data, route, method = "you-get"):
     return "finish"
 
 
-def download_multi(data, route, method = "you-get"):
+def download_multi(data, route, opsys, method = "you-get"):
 
     videourl = "https://www.bilibili.com/video/av"
     datasvrt,imgsvrt,videosvrt = route
@@ -132,8 +155,7 @@ def download_multi(data, route, method = "you-get"):
     if expt == "y":
         with open(datasvrt, "w", encoding="utf-8") as exfile:
             for video in data:
-                # 标题使用替换特殊字符后的标题
-                exfile.write((video["aid"] + "---" + rplchr(video["title"]) + "---" + video["pic"] + "\n"))
+                exfile.write((video["aid"] + "---" + video["title"] + "---" + video["pic"] + "\n"))
         print("Finish export data")
     else:
         print("Skip")
@@ -142,9 +164,9 @@ def download_multi(data, route, method = "you-get"):
     if downldpic == "y":
         p = Pool()
         for video in data:
-            # 使用代替特殊字符
-            otptname = reduce(lambda x, y: x + y, map(rmvchr, video["title"]))
-            p.apply_async(dl,(method, imgsvrt, otptname, video["pic"]))
+            # 使用代替特殊字符后的标题
+            otptname = rplchr(video["title"], opsys)
+            p.apply_async(dl, (opsys, method, imgsvrt, otptname, video["pic"]))
         p.close()
         p.join()
         print("Finish download covers")
@@ -155,20 +177,20 @@ def download_multi(data, route, method = "you-get"):
     if downld == "y":
         p = Pool()
         for video in data:
-            # 使用代替特殊字符
-            otptname = parsetitle(reduce(lambda x, y: x + y, map(rmvchr, video["title"])))
-            p.apply_async(dl, (method, videosvrt, otptname, videourl+video["aid"]))
+            # 使用代替特殊字符后的标题
+            otptname = parsetitle(rplchr(video["title"], opsys))
+            p.apply_async(dl, (opsys, method, videosvrt, otptname, videourl+video["aid"]))
         p.close()
         p.join()
         print("Finish download video")
     else:
         print("Skip")
-
     return "finish"
 
 if __name__=="__main__":
-    #favlink = input("Enter Favorite Folder Link")
-    favlink = "https://space.bilibili.com/10003632/#/favlist?fid=20677228/"
+    #获取操作系统类型
+    opsys = platform.system()
+    favlink = input("Enter Favorite Folder Link")
     #如果最后有/则去掉/
     if favlink[-1] == "/":
         favlink = favlink[:-1:]
