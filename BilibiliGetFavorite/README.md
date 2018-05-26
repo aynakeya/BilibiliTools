@@ -27,4 +27,4 @@ Mar.28.2018 : Rewrite getdata() by using json<br>
 Apr.3.2018 : Use lulu instead of you-get<br>
 May.20.2018 : Rewrite<br>
 May.22.2018 : Add multiprocess download.<br>
-May.22.2018 : Fix Bug support on windows now.<br>
+May.22.2018 : Fix Bugs, support on windows now.<br>
