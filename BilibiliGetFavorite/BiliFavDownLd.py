@@ -17,6 +17,8 @@ rplchrdict_unix = {"/": "-",
              " " : "' '",
              "&" : "-",
              "'" : "\"'\"",
+             "(" : "-",
+             ")" : "-"
             }
 
 rplchrdict_windows = {"/": "-",
@@ -31,6 +33,8 @@ rplchrdict_windows = {"/": "-",
              "\"" : "-",
              "→" : "-",
              "&" : "-",
+             "(" : "-",
+             ")" : "-"
             }
 
 unicdchr = {"\\u0026": "&",
@@ -42,11 +46,16 @@ def rplchr(s,opsys) :
         chrdict = rplchrdict_windows
     else:
         chrdict = rplchrdict_unix
-    for key, value in chrdict.items():
-        s = s.replace(key, value)
+
+    newstr = ""
+    for i in range(len(s)):
+        if s[i] in chrdict:
+            newstr += chrdict[s[i]]
+        else:
+            newstr += s[i]
     if s[0] == "-":
         s = "rmv"+s
-    return s
+    return newstr
 
 def unicdefmt(s):
     for key, value in unicdchr.items():
