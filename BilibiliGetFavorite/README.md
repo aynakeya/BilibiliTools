@@ -13,11 +13,11 @@ Make sure you Favourite list is public<br>
 enter the number of video you want download(from newest)(e.g enter your number: 503 ==> stand for download newest 503 videos)<br>
 输入想要下载的视频数量(从最新的一个开始计算)(例子：enter your number: 503 ==> 下载前503个视频)<br>
 <br>
-enter the path you want to save the videos(full path):<br>
-输入视频保存位置，全路径（加'/'）<br>
+enter the path you want to save the videos:<br>
+输入视频保存位置<br>
 <br>
 enter the path you want to save the data(full path with document name):<br>
-输入保存的文件名字(请先确保文档存在)<br>
+输入保存的文件名字<br>
 <br>
 enjoy :)<br>
 <br>
@@ -27,3 +27,4 @@ Mar.28.2018 : Rewrite getdata() by using json<br>
 Apr.3.2018 : Use lulu instead of you-get<br>
 May.20.2018 : Rewrite<br>
 May.22.2018 : Add multiprocess download.<br>
+May.22.2018 : Fix Bug support on windows now.<br>
