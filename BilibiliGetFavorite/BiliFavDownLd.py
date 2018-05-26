@@ -214,4 +214,4 @@ if __name__=="__main__":
     videosvrt = input("Enter video save route(full)")
 
     data = getdata(number)
-    download_multi(data,(datasvrt,imgsvrt,videosvrt))
+    download_multi(data,(datasvrt,imgsvrt,videosvrt),opsys)
