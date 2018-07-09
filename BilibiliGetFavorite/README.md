@@ -21,16 +21,16 @@ Make sure you Favourite list is public<br>
 ~~enter the path you want to save the data(full path with document name):<br>~~
 ~~输入保存的文件名字<br>~~
 <br>
-python BiliFavDownLD.py [-h] [-s] [-n] [-d] [-c] [-v] [-m] [--method] favlink
-Options:
--h/--help: help
--s/--saveroute: saveroute(default: current dir)
--n/--number: number u want to download(default: 1)
--d: export data
--c: download cover
--v: download video
--m: use muliprocessing
---method: use which to download(default:you-get)
+python BiliFavDownLD.py [-h] [-s] [-n] [-d] [-c] [-v] [-m] [--method] favlink<br>
+Options:<br>
+-h/--help: help<br>
+-s/--saveroute: saveroute(default: current dir)<br>
+-n/--number: number u want to download(default: 1)<br>
+-d: export data<br>
+-c: download cover<br>
+-v: download video<br>
+-m: use muliprocessing<br>
+--method: use which to download(default:you-get)<br>
 enjoy :)<br>
 <br>
 Dec.4.2017 : Fisrt Upload.<br>
