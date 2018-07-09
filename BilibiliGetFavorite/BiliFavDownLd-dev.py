@@ -1,6 +1,7 @@
 from urllib import request
-import json,time,os,platform,sys,getopt
+import json,time,os,platform
 from multiprocessing import Pool
+from VocaloidParse import parsetitle
 
 rplchrdict_unix = {"/": "-",
              "\\": "-",
@@ -31,7 +32,7 @@ rplchrdict_windows = {"/": "-",
              "：" : "-",
              "\"" : "-",
              "→" : "-",
-             "&" : "-",
+             "&" : "-"
             }
 
 unicdchr = {"\\u0026": "&",
@@ -91,10 +92,6 @@ def getdata(number):
         code = jsondata["code"]
         if code == 0:
             print("获取成功",end="")
-        elif code == 11004:
-            print("返回值:11004,返回信息:收藏夹未公开")
-            print("请确保收藏夹公开\n程序结束")
-            sys.exit()
         else:
             print("返回值:%s,返回信息:%s" % (code, jsondata["message"]))
             while code != 0:
@@ -121,55 +118,57 @@ def download_by_aria2(data):
     #i don't know how to do that
     pass
 
-def download(data, route, dcv, method = "you-get"):
+def download(data, route, method = "you-get"):
 
     videourl = "https://www.bilibili.com/video/av"
     datasvrt,imgsvrt,videosvrt = route
     expt = input("Export Data? y/n ")
-    if dcv[0]:
+    if expt == "y":
         with open(datasvrt, "w", encoding="utf-8") as exfile:
             for video in data:
                 exfile.write((video["aid"] + "---" + video["title"] + "---" + video["pic"] + "\n"))
         print("Finish export data")
     else:
-        print("Skip export data")
+        print("Skip")
 
     downldpic = input("Download Covers? y/n ")
-    if dcv[1]:
+    if downldpic == "y":
         for video in data:
             # 使用代替特殊字符后的标题
             otptname = rplchr(video["title"],opsys)
             dl(opsys, method, imgsvrt, otptname, video["pic"])
         print("Finish download covers")
     else:
-        print("Skip download covers")
+        print("Skip")
 
     downld = input("Download Video? y/n ")
-    if dcv[2]:
+    if downld == "y":
         for video in data:
             # 使用代替特殊字符后的标题
             otptname = rplchr(video["title"], opsys)
             dl(opsys, method, videosvrt, otptname, videourl + video["aid"])
         print("Finish download video")
     else:
-        print("Skip download videos")
+        print("Skip")
 
     return "finish"
 
 
-def download_multi(opsys, data, route, dcv, method = "you-get"):
+def download_multi(data, route, opsys, method = "you-get"):
 
     videourl = "https://www.bilibili.com/video/av"
     datasvrt,imgsvrt,videosvrt = route
-    if dcv[0]:
+    expt = input("Export Data? y/n ")
+    if expt == "y":
         with open(datasvrt, "w", encoding="utf-8") as exfile:
             for video in data:
                 exfile.write((video["aid"] + "---" + video["title"] + "---" + video["pic"] + "\n"))
         print("Finish export data")
     else:
-        print("Skip export data")
+        print("Skip")
 
-    if dcv[1]:
+    downldpic = input("Download Covers? y/n ")
+    if downldpic == "y":
         p = Pool()
         for video in data:
             # 使用代替特殊字符后的标题
@@ -179,97 +178,40 @@ def download_multi(opsys, data, route, dcv, method = "you-get"):
         p.join()
         print("Finish download covers")
     else:
-        print("Skip download covers")
+        print("Skip")
 
-    if dcv[2]:
+    downld = input("Download Video? y/n ")
+    if downld == "y":
         p = Pool()
         for video in data:
             # 使用代替特殊字符后的标题
-            otptname = rplchr(video["title"], opsys)
+            otptname = parsetitle(rplchr(video["title"], opsys))
             p.apply_async(dl, (opsys, method, videosvrt, otptname, videourl+video["aid"]))
         p.close()
         p.join()
         print("Finish download video")
     else:
-        print("Skip download videos")
+        print("Skip")
     return "finish"
 
-if __name__ == "__main__":
-    # 获取操作系统类型
+if __name__=="__main__":
+    #获取操作系统类型
     opsys = platform.system()
-    svrt = sys.path[0]
-    datasvrt = os.path.join(svrt,"data.txt")
-    imgsvrt = os.path.join(svrt,"img")
-    videosvrt = os.path.join(svrt,"video")
-    number = 1
-    method = "you-get"
-    dcv = [False,False,False]
-    usemulti = False
-    try:
-        options, args = getopt.getopt(sys.argv[1:], "hdcvms:n:", ["help", "saveroute=", "number=","method="])
-    except:
-        print("illegal option")
-        sys.exit()
-    for key,value in options:
-        if key == "-h" or key == "--help":
-            print("python BiliFavDownLD.py "
-                  "[-s] [-n] [-d] [-c] [-v] [-m] [--method] favlink")
-            print("Options:\n"
-                  "-s/--saveroute: saveroute(default: current dir)\n"
-                  "-n/--number: number u want to download(default: 1)\n"
-                  "-d: export data\n"
-                  "-c: download cover\n"
-                  "-v: download video\n"
-                  "-m: use muliprocessing\n"
-                  "--method: use which to download(default:you-get)")
-            print("程序结束")
-            sys.exit()
-        if key == "-d":
-            dcv[0] = True
-        if key == "-c":
-            dcv[1] = True
-        if key == "-v":
-            dcv[2] = True
-        if key == "-m":
-            usemulti = True
-        if key == "--method":
-            method = str(value)
-        if key == "-s" or key == "--saveroute":
-            if not os.path.exists(str(value)):
-                print("Path not exist")
-                sys.exit()
-            else:
-                svrt = str(value)
-                datasvrt = os.path.join(svrt, "data.txt")
-                imgsvrt = os.path.join(svrt, "img")
-                videosvrt = os.path.join(svrt, "video")
-        if key == "-n" or key == "--number":
-            if str(value).isdigit():
-                number = int(value)
-            else:
-                print("Not a correct number")
-                sys.exit()
-    if len(args) != 1:
-        print("No Favorite Link or to much args")
-        sys.exit()
-    favlink = args[0]
-    # 如果最后有/则去掉/
+    favlink = input("Enter Favorite Folder Link")
+    #如果最后有/则去掉/
     if favlink[-1] == "/":
         favlink = favlink[:-1:]
-    # 获取vmid
+    #获取vmid
     vmid = favlink[favlink.find("com", 0) + 4:favlink.find("/#", 0):]
-    # 获取fid
+    #获取fid
     fid = favlink[favlink.find("fid", 0) + 4::]
-    if len(vmid) == 0 or len(fid) == 0:
-        print("Not a Proper Link")
-        sys.exit()
-    print("You vmid is: %s, you fid is: %s" %(vmid,fid))
-    # api链接
+    #api链接
     apiurl = "https://api.bilibili.com/x/v2/fav/video?vmid=%s&ps=1&fid=%s&pn=%s" % (vmid, fid, "%s")
+    #获取需要个数
+    number = int(input("enter your number: "))
+    datasvrt = input("Enter data save route(full)")
+    imgsvrt = input("Enter image save route(full)")
+    videosvrt = input("Enter video save route(full)")
+
     data = getdata(number)
-    if usemulti:
-        download_multi(opsys, data, (datasvrt, imgsvrt, videosvrt), dcv,method = method)
-    else:
-        download(data,(datasvrt, imgsvrt, videosvrt), dcv,method = method)
-    print("程序结束")
-    sys.exit()
+    download_multi(data,(datasvrt,imgsvrt,videosvrt),opsys)
