@@ -38,6 +38,8 @@ unicdchr = {"\\u0026": "&",
               "\\u003c" : "<",
               "\\u003e" : ">"}
 
+apiurl = "https://api.bilibili.com/x/space/fav/arc?vmid=%s&ps=1&fid=%s&pn=%s" % ("%s", "%s", "%s")
+
 def rplchr(s,opsys) :
     if opsys == "Windows":
         chrdict = rplchrdict_windows
@@ -60,9 +62,9 @@ def unicdefmt(s):
     return s
 
 
-def getdata(number):
+def getdata(apiurl,number):
 
-    def tryget():
+    def tryget(wholeurl):
         try:
             wholeHTML = request.urlopen(wholeurl).read().decode("utf-8")
             jsondata = json.loads(wholeHTML)
@@ -82,12 +84,11 @@ def getdata(number):
         return jsondata
 
     data = []
-    for pn in range(number):
-        pn += 1
+    for pn in range(1,number+1,1):
         print("获取数据: 第%s个==>" % pn,end="")
         #格式化api
         wholeurl = apiurl % pn
-        jsondata = tryget()
+        jsondata = tryget(wholeurl)
         code = jsondata["code"]
         if code == 0:
             print("获取成功",end="")
@@ -99,18 +100,21 @@ def getdata(number):
             print("返回值:%s,返回信息:%s" % (code, jsondata["message"]))
             while code != 0:
                 print("获取数据: 第%s个==>" % pn, end="")
-                jsondata = tryget()
+                jsondata = tryget(wholeurl)
                 code = jsondata["code"]
             print("获取成功",end="")
 
         #对于标题，将特殊的Unicode\u 替换成正常字符串.
         data.append({"aid":str(jsondata["data"]["archives"][0]["aid"]),
                      "title":unicdefmt(str(jsondata["data"]["archives"][0]["title"])),
-                     "pic":str(jsondata["data"]["archives"][0]["pic"])})
-        print("------(AV号:%s,标题:%s)" % (data[pn-1]["aid"], data[pn-1]["title"]))
+                     "pic":str(jsondata["data"]["archives"][0]["pic"]),
+                     "state":str(jsondata["data"]["archives"][0]["state"])})
+        print("------(AV号:%s,标题:%s,状态:%s)" % (data[pn-1]["aid"], data[pn-1]["title"],data[pn-1]["state"],))
     return data
 
 def dl(opsys,method,svrt,otptname,url):
+    if url == "-1":
+        return
     if opsys == "Windows":
         os.system("%s --output-dir \"%s\" --output-filename \"%s\" %s" % (method, svrt, otptname, url))
     else:
@@ -121,11 +125,10 @@ def download_by_aria2(data):
     #i don't know how to do that
     pass
 
-def download(data, route, dcv, method = "you-get"):
+def download(opsys,data, route, dcv, method = "you-get"):
 
     videourl = "https://www.bilibili.com/video/av"
     datasvrt,imgsvrt,videosvrt = route
-    expt = input("Export Data? y/n ")
     if dcv[0]:
         with open(datasvrt, "w", encoding="utf-8") as exfile:
             for video in data:
@@ -134,7 +137,6 @@ def download(data, route, dcv, method = "you-get"):
     else:
         print("Skip export data")
 
-    downldpic = input("Download Covers? y/n ")
     if dcv[1]:
         for video in data:
             # 使用代替特殊字符后的标题
@@ -144,9 +146,11 @@ def download(data, route, dcv, method = "you-get"):
     else:
         print("Skip download covers")
 
-    downld = input("Download Video? y/n ")
     if dcv[2]:
         for video in data:
+            if video["state"] != 0:
+                print("视频失效或其他原因")
+                continue
             # 使用代替特殊字符后的标题
             otptname = rplchr(video["title"], opsys)
             dl(opsys, method, videosvrt, otptname, videourl + video["aid"])
@@ -184,6 +188,9 @@ def download_multi(opsys, data, route, dcv, method = "you-get"):
     if dcv[2]:
         p = Pool()
         for video in data:
+            if video["state"] != "0":
+                print("下载视频:%s(aid:%s)时出现问题，视频失效或其他原因",video["title"],video["aid"])
+                continue
             # 使用代替特殊字符后的标题
             otptname = rplchr(video["title"], opsys)
             p.apply_async(dl, (opsys, method, videosvrt, otptname, videourl+video["aid"]))
@@ -265,11 +272,11 @@ if __name__ == "__main__":
         sys.exit()
     print("You vmid is: %s, you fid is: %s" %(vmid,fid))
     # api链接
-    apiurl = "https://api.bilibili.com/x/v2/fav/video?vmid=%s&ps=1&fid=%s&pn=%s" % (vmid, fid, "%s")
-    data = getdata(number)
+    apiurl = apiurl % (vmid, fid, "%s")
+    data = getdata(apiurl,number)
     if usemulti:
         download_multi(opsys, data, (datasvrt, imgsvrt, videosvrt), dcv,method = method)
     else:
-        download(data,(datasvrt, imgsvrt, videosvrt), dcv,method = method)
+        download(opsys,data,(datasvrt, imgsvrt, videosvrt), dcv,method = method)
     print("程序结束")
     sys.exit()
