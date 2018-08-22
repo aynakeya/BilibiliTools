@@ -20,7 +20,7 @@ BiliBiliAddFavorite 是向自己的一个收藏夹里批量添加视频<br>
 嘛，当然又得装一个requests库<br>
 <br>
 2.<br>
-VocaloidParse 是将b站中文Vocaloid歌曲标题格式化的工具<br>
+Vocaloid 是关于b站中文Vocaloid的工具<br>
 嘛，当然基本上就我一个人会去用啦<br>
 具体去里面看啦<br>
 <br>
