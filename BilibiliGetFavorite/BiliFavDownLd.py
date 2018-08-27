@@ -189,7 +189,7 @@ def download_multi(opsys, data, route, dcv, method = "you-get"):
         p = Pool()
         for video in data:
             if video["state"] != "0":
-                print("下载视频:%s(aid:%s)时出现问题，视频失效或其他原因",video["title"],video["aid"])
+                print("下载视频:%s(aid:%s)时出现问题，视频失效或其他原因" % (video["title"],video["aid"]))
                 continue
             # 使用代替特殊字符后的标题
             otptname = rplchr(video["title"], opsys)
