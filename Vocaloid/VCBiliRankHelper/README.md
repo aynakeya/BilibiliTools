@@ -5,3 +5,4 @@ b站中文Vocaloid周刊抄榜助手<br>
 enjoy :)<br>
 <br>
 August.22.2018 : Fisrt Upload.<br>
+August.29.2018 : Fix Bugs.<br>

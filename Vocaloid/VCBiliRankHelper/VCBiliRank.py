@@ -2,30 +2,29 @@ import requests,re
 import json,time,sys,os
 from functools import reduce
 
-
-class vsingersparser(object):
+class vocaloidparser(object):
     def __init__(self):
         self.__vsingerlist = ["洛天依", "言和", "乐正绫", "心华", "星尘", "乐正龙牙", "初音未来", "墨清弦", "徵羽摩柯"]
         self.__vsingerdict = {"洛天依": 2,  # 0b10
-                       "乐正绫": 4,  # 0b100
-                       "言和": 8,  # 0b1000
-                       "心华": 16,  # 0b10000
-                       "星尘": 32,  # 0b100000
-                       "乐正龙牙": 64,  # 0b1000000
-                       "龙牙": 64,
-                       "初音未来": 128,
-                       "初音": 128,
-                       "墨清弦": 256,
-                       "徵羽摩柯": 512,
-                       "摩柯": 512,
-                       }
+                              "乐正绫": 4,  # 0b100
+                              "言和": 8,  # 0b1000
+                              "心华": 16,  # 0b10000
+                              "星尘": 32,  # 0b100000
+                              "乐正龙牙": 64,  # 0b1000000
+                              "龙牙": 64,
+                              "初音未来": 128,
+                              "初音": 128,
+                              "墨清弦": 256,
+                              "徵羽摩柯": 512,
+                              "摩柯": 512,
+                              }
         self.__vsingersdict = {"0": ""}
         self.combinesingers([], self.__vsingerlist)
 
-    def getkey(self,singerlist):
+    def getkey(self, singerlist):
         return str(reduce(lambda x, y: x + y, map(lambda singer: self.__vsingerdict[singer], singerlist)))
 
-    def combinesingers(self,used,notused):
+    def combinesingers(self, used, notused):
         if len(notused) < 1:
             return
         newnotused = notused.copy()
@@ -36,11 +35,11 @@ class vsingersparser(object):
             self.__vsingersdict[self.getkey(newused)] = newused
             self.combinesingers(newused, newnotused)
 
-    def getSingersByTitleParser(self,title):
+    def getSingersByTitleParser(self, title):
         singerskey = 0
         if title == None:
             title = ""
-        for singer in self.__vsingerdict:
+        for singer in self.__vsingerdict.keys():
             if singer in title:
                 if singerskey & (1 << (str(bin(self.__vsingerdict[singer])).count('0') - 1)):
                     continue
@@ -51,7 +50,20 @@ class vsingersparser(object):
         else:
             return self.__vsingersdict[str(singerskey)]
 
-    def getParsedTitle(self,title):
+    def getSingersByTags(self, tags):
+        tags = list(tags)
+        singerskey = 0
+        for tag in tags:
+            if tag in self.__vsingerdict.keys():
+                if singerskey & (1 << (str(bin(self.__vsingerdict[tag])).count('0') - 1)):
+                    continue
+                singerskey += self.__vsingerdict[tag]
+        if singerskey == 0:
+            return []
+        else:
+            return self.__vsingersdict[str(singerskey)]
+
+    def getParsedTitleByFind(self, title):
         if title == None:
             title = ""
         titlebackup = title
@@ -65,6 +77,27 @@ class vsingersparser(object):
         else:
             return titlebackup
 
+    def getParsedTitleByRe(self, title):
+
+        parsedtitle = re.sub(r"【[\s\S]+?】", "", title)
+
+        if len(parsedtitle) == 0:
+            return title
+        else:
+            return parsedtitle
+
+    def getOutputFilename(self, title, singers, album):
+        return "---".join([title, "、".join(singers), album])
+
+    def ReqTags(self, aid):
+        url = "https://api.bilibili.com/x/tag/archive/tags?aid=%s" % aid
+        wb_data = requests.get(url)
+        data = json.loads(wb_data.text)
+        tags = []
+        for item in data["data"]:
+            tags.append(item["tag_name"])
+        return tags
+
 class rankitem(object):
     def __init__(self,aid,title,parsedtitle,singers,author):
         self.__title = title
@@ -74,24 +107,23 @@ class rankitem(object):
         self.__author = author
 
     @classmethod
-    def initFromitem(cls,item,parser,method=0):
+    def initFromitem(cls,item,parser):
         title = item["title"]
         aid = item["avid"]
-        parsedtitle = parser.getParsedTitle(title)
-        if method == 0:
-            singers = parser.getSingersByTitleParser(title)
-        else:
-            singers = []
-        return cls(aid,title,parsedtitle,singers,cls.reqUp(aid))
+        parsedtitle = parser.getParsedTitleByRe(title)
+        title1, author, tags = cls.reqInfo(aid)
+        singers = parser.getSingersByTitleParser(title)
+        if len(singers) == 0:
+            singers = parser.getSingersByTags(tags.split(","))
+        return cls(aid,title,parsedtitle,singers,author)
 
     @classmethod
-    def initFromAid(cls, aid, parser, method=0):
-        title,author = cls.reqInfo(aid)
-        parsedtitle = parser.getParsedTitle(title)
-        if method == 0:
-            singers = parser.getSingersByTitleParser(title)
-        else:
-            singers = []
+    def initFromAid(cls, aid, parser):
+        title,author,tags = cls.reqInfo(aid)
+        parsedtitle = parser.getParsedTitleByRe(title)
+        singers = parser.getSingersByTitleParser(title)
+        if len(singers) == 0:
+            singers = parser.getSingersByTags(tags.split(","))
         return cls(aid, title, parsedtitle, singers, author)
 
     @classmethod
@@ -103,18 +135,7 @@ class rankitem(object):
             return (None,None)
         else:
             rs = data["data"]["result"]["video"][0]
-            return (rs["title"],rs["author"])
-
-    @classmethod
-    def reqUp(self,aid):
-        url = "https://api.bilibili.com/x/web-interface/search/all?keyword=av%s" % aid
-        wb_data = requests.get(url)
-        data = json.loads(wb_data.text)
-        if len(data["data"]["result"]["video"]) == 0:
-            return None
-        else:
-            rs = data["data"]["result"]["video"][0]
-            return rs["author"]
+            return (rs["title"],rs["author"],rs["tag"])
 
     def getTitle(self):
         return self.__title
@@ -583,7 +604,7 @@ def getsingercount(op, mainranklist, superhitlist, pickuplist, woclist):
 
 if __name__ == "__main__":
     print("初始化....")
-    parser = vsingersparser()
+    parser = vocaloidparser()
     mode = input("请选择输入模式 a:手动输入 b:文本导入-")
     otpt = input("是否将结果导出为文件(y/n)(default:n)")
     if otpt == "y":
