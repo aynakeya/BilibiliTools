@@ -12,3 +12,4 @@ enjoy :)<br>
 <br>
 April.4.2018 : Fisrt Upload.<br>
 April.4.2018 : Fix Bug about repeat name.<br>
+Aug.31.2018 : Rewrite.<br>
