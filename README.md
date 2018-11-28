@@ -13,7 +13,7 @@ Index:<br>
 BilibiliGetFavorite 是获取某公开收藏夹里所有视频的工具<br>
 如果装了you-get的话，可以下载的说<br>
 ps:嘛，这个东西问题还是很多的，各位可以自己改一改代码<br>
-pss:想尝试一下的话可以访问这里哟: https://www.lxgshadow.us/project/python/bilibilitools<br>
+pss:想尝试一下的话可以访问这里哟: https://www.lxgshadow.us/projects/dynamic/python/favfolder<br>
 <br>
 2.<br>
 BiliBiliAddFavorite 是向自己的一个收藏夹里批量添加视频<br>
