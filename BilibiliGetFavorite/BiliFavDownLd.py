@@ -260,13 +260,16 @@ if __name__ == "__main__":
         print("No Favorite Link or to much args")
         sys.exit()
     favlink = args[0]
-    # 如果最后有/则去掉/
     if favlink[-1] == "/":
         favlink = favlink[:-1:]
-    # 获取vmid
-    vmid = favlink[favlink.find("com", 0) + 4:favlink.find("/#", 0):]
+    # 获取mid
+    mid = favlink[favlink.find("com/", 0) + 4:favlink.find("/", favlink.find("com/", 0)+4):]
     # 获取fid
     fid = favlink[favlink.find("fid", 0) + 4::]
+    if not mid.isdigit():
+        mid = ""
+    if not fid.isdigit():
+        fid = ""
     if len(vmid) == 0 or len(fid) == 0:
         print("Not a Proper Link")
         sys.exit()

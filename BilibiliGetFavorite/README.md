@@ -42,3 +42,4 @@ May.22.2018 : Add multiprocess download.<br>
 May.22.2018 : Fix Bugs, support on windows now.<br>
 July.9.2018 : Rewrite.<br>
 July.28.2018 : Fix api. /video --> /arc.<br>
+Nov.29.2018 : Fix bug: parse link error fixed.<br>
