@@ -26,7 +26,7 @@ Vocaloid 是关于b站中文Vocaloid的工具<br>
 <br>
 4.<br>
 BiliBili-EnablePIP<br>
-大概是给mac用户用的<br>
+大概是给 mac用户+windows Chrome用户 做的<br>
 在B站开启画中画的js脚本<br>
 <br>
 
