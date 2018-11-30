@@ -1,0 +1,55 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>Author</key>
+	<string>lxgshadow</string>
+	<key>Builder Version</key>
+	<string>12606.2.104.1.2</string>
+	<key>CFBundleDisplayName</key>
+	<string>BiliBili-EnablePIP</string>
+	<key>CFBundleIdentifier</key>
+	<string>com.lxgshadow.BiliBiliEnablePIP</string>
+	<key>CFBundleInfoDictionaryVersion</key>
+	<string>6.0</string>
+	<key>CFBundleShortVersionString</key>
+	<string>1.0</string>
+	<key>CFBundleVersion</key>
+	<string>1</string>
+	<key>Chrome</key>
+	<dict/>
+	<key>Content</key>
+	<dict>
+		<key>Scripts</key>
+		<dict>
+			<key>End</key>
+			<array>
+				<string>OPENPIP.js</string>
+			</array>
+		</dict>
+		<key>Whitelist</key>
+		<array>
+			<string>https://www.bilibili.com/video/*</string>
+			<string>https://www.bilibili.com/bangumi/*/*</string>
+		</array>
+	</dict>
+	<key>Description</key>
+	<string>Enable Picture in Picture mode in Bilibili</string>
+	<key>DeveloperIdentifier</key>
+	<string>X9952MR239</string>
+	<key>ExtensionInfoDictionaryVersion</key>
+	<string>1.0</string>
+	<key>Permissions</key>
+	<dict>
+		<key>Website Access</key>
+		<dict>
+			<key>Include Secure Pages</key>
+			<true/>
+			<key>Level</key>
+			<string>All</string>
+		</dict>
+	</dict>
+	<key>Website</key>
+	<string>https://lxgshadow.us</string>
+</dict>
+</plist>
