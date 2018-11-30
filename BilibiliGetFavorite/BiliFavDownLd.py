@@ -92,7 +92,7 @@ def getdata(apiurl,number):
         code = jsondata["code"]
         if code == 0:
             print("获取成功",end="")
-        elif code == 11004:
+        elif code == 11004 or code == 11010 or code == 53013:
             print("返回值:11004,返回信息:收藏夹未公开")
             print("请确保收藏夹公开\n程序结束")
             sys.exit()
