@@ -25,6 +25,7 @@ Vocaloid 是关于b站中文Vocaloid的工具<br>
 具体去里面看啦<br>
 <br>
 4.<br>
+OpenPiPMode<br>
 大概是给mac用户用的<br>
 在B站开始画中画的js脚本<br>
 <br>
