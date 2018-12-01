@@ -12,5 +12,5 @@ click to switch<br>
 在视频上右键<br>
 点最后一栏<br>
 Nov.30.2018 : Fisrt Upload.<br>
-
+Dec.1.2018 : Fix Bug about new player<br>
 

@@ -1,21 +1,21 @@
 var myScript = document.createElement('script');
 myScript.textContent =`
 var b_pipMode = null;
-var barSelector = "#bilibiliPlayer > div.bilibili-player-context-menu-container>ul";
+var barSelector = "#bilibiliPlayer > div.bilibili-player-context-menu-container.bilibili-player-context-menu-origin>ul";
 var videoSelector = "#bilibiliPlayer > video";
 var abc;
 var switchpipmode = function(){
     if (b_pipMode){
         $("video").removeAttr("controls");
         $("div.bilibili-player-video-subtitle").css("z-index","");
-        $("#pipswith").text("开启画中画状态");
+        $("#pipswitch").text("开启画中画状态");
         b_pipMode = false;
     }
     else{
         $("video").attr("controls","controls");
         $("div.bilibili-player-video-subtitle").css("z-index","-1");
         b_pipMode = true;
-        $("#pipswith").text("关闭画中画状态");
+        $("#pipswitch").text("关闭画中画状态");
     }
 }
 function addToToolBar(){
@@ -25,12 +25,12 @@ function addToToolBar(){
         var $a0 = $("<a></a>");
         $a0.addClass("context-menu-a js-action");
         $a0.attr("href","javascript:void(0);");
-        $a0.attr("id","pipswith");
+        $a0.attr("id","pipswitch");
         b_pipMode = false;
         $a0.text("开启画中画状态");
         $il0.append($a0);
+        $a0.click(switchpipmode);
         $(barSelector).append($il0);
-        $("#pipswith").click(switchpipmode);
         clearTimeout(abc);
     }
     else{
