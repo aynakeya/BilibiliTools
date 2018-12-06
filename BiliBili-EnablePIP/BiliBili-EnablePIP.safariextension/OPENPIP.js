@@ -1,4 +1,7 @@
 var myScript = document.createElement('script');
+var oScript = document.createElement('script');
+oScript.type = "text/javascript";
+oScript.src="//s1.hdslb.com/bfs/static/jinkela/long/js/jquery/jquery1.7.2.min.js";
 myScript.textContent =`
 var b_pipMode = null;
 var barSelector = "#bilibiliPlayer > div.bilibili-player-context-menu-container.bilibili-player-context-menu-origin>ul";
@@ -37,7 +40,13 @@ function addToToolBar(){
         abc = setTimeout(addToToolBar,100);
     }
 }
-$(document).ready(addToToolBar);
+if (!window.jQuery){
+    var oScript = document.createElement('script');
+    oScript.type = "text/javascript";
+    oScript.src="//s1.hdslb.com/bfs/static/jinkela/long/js/jquery/jquery1.7.2.min.js";
+    document.head.appendChild(oScript);
+}
+window.onload=addToToolBar;
 `;
 if (window.parent.document.body != null){
     window.parent.document.body.appendChild(myScript);

@@ -270,12 +270,12 @@ if __name__ == "__main__":
         mid = ""
     if not fid.isdigit():
         fid = ""
-    if len(vmid) == 0 or len(fid) == 0:
+    if len(mid) == 0 or len(fid) == 0:
         print("Not a Proper Link")
         sys.exit()
-    print("You vmid is: %s, you fid is: %s" %(vmid,fid))
+    print("You vmid is: %s, you fid is: %s" %(mid,fid))
     # api链接
-    apiurl = apiurl % (vmid, fid, "%s")
+    apiurl = apiurl % (mid, fid, "%s")
     data = getdata(apiurl,number)
     if usemulti:
         download_multi(opsys, data, (datasvrt, imgsvrt, videosvrt), dcv,method = method)
