@@ -5,7 +5,7 @@ import re,requests,json
 
 class vocaloidparser(object):
     def __init__(self):
-        self.__vsingerlist = ["洛天依", "言和", "乐正绫", "心华", "星尘", "乐正龙牙", "初音未来", "墨清弦", "徵羽摩柯"]
+        self.__vsingerlist = ["洛天依", "言和", "乐正绫", "心华", "星尘", "乐正龙牙", "初音未来", "墨清弦", "徵羽摩柯","章楚楚","悦成"]
         self.__vsingerdict = {"洛天依": 2,  # 0b10
                               "乐正绫": 4,  # 0b100
                               "言和": 8,  # 0b1000
@@ -18,6 +18,9 @@ class vocaloidparser(object):
                               "墨清弦": 256,
                               "徵羽摩柯": 512,
                               "摩柯": 512,
+                              "章楚楚":1024,
+                              "楚楚":1024,
+                              "悦成":2048
                               }
         self.__vsingersdict = {"0": ""}
         self.combinesingers([], self.__vsingerlist)
