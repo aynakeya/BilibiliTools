@@ -1,14 +1,13 @@
 // ==UserScript==
 // @name         BiliBili-EnablePIP
 // @namespace    None
-// @version      1.0.1
+// @version      1.0.3
 // @description  Enable Picture in Picture mode in Bilibli 在b站中打开画中画模式，使chrome/safair能在b站使用画中画。
 // @author       LXG_Shadow
 // @match        https://www.bilibili.com/video/*
 // @match        https://www.bilibili.com/bangumi/play/*
 // @run-at       document-end
 // @grant        none
-// @require      http://libs.baidu.com/jquery/1.7.2/jquery.min.js
 // ==/UserScript==
 
 (function() {
@@ -49,5 +48,11 @@
             abc = setTimeout(addToToolBar, 100);
         }
     }
-    addToToolBar();
+    if (!window.jQuery){
+        var oScript = document.createElement('script');
+        oScript.type = "text/javascript";
+        oScript.src="//s1.hdslb.com/bfs/static/jinkela/long/js/jquery/jquery1.7.2.min.js";
+        document.head.appendChild(oScript);
+    }
+    window.onload=addToToolBar;
 })();
