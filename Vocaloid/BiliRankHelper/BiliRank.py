@@ -3,7 +3,6 @@ import json, time, sys, os
 from functools import reduce
 from VocaloidParse import vocaloidparser
 
-
 class rankitem(object):
     def __init__(self, aid, title, parsedtitle, singers, author):
         self.title = title
@@ -194,8 +193,8 @@ class zkVocaloid(object):
     def __init__(self, parser):
 
         self.parser = parser
-        self.zb = dict((index, None) for index in range(1, 31))
-        self.woc = dict((index, None) for index in range(1, 6))
+        self.zb = dict((str(index), None) for index in range(1, 31))
+        self.woc = dict((str(index), None) for index in range(1, 6))
         self.pickup = []
         self.superhit = []
         self.op = None
@@ -228,11 +227,11 @@ class zkVocaloid(object):
             for line in f.readlines():
                 l = line.strip().split("=")
                 if ((l[0].split("_")[0]) == "zb") and (len(l[1]) != 0):
-                    if self.zb.get(l[0].split("_")[1]) == None:
+                    if not l[0].split("_")[1] in self.zb.keys():
                         continue
                     self.zb[l[0].split("_")[1]] = rankitem.initFromAid(l[1], self.parser)
                 elif (l[0].split("_")[0] == "woc") and (len(l[1]) != 0):
-                    if self.woc.get(l[0].split("_")[1]) == None:
+                    if not l[0].split("_")[1] in self.woc.keys():
                         continue
                     self.woc[l[0].split("_")[1]] = rankitem.initFromAid(l[1], self.parser)
                 elif (l[0] == "pickup") and (len(l[1]) != 0):
@@ -297,11 +296,25 @@ class zkVocaloid(object):
             f.write("\n---------------------------------------------------------\n")
 
 
+modes = {"vocaloid-zk":lambda :zkVocaloid(vocaloidparser()),
+         "vocaloid-unlimit":lambda :unlimitVocaloid(vocaloidparser()),
+         "unlimit":unlimitVideo}
+
+modesdesc = {"vocaloid-zk":"周刊Vocaloid模式，有歌名格式化功能",
+         "vocaloid-unlimit":"Vocaloid模式，有歌名格式化功能",
+         "unlimit":"自由模式，仅输出标题，up与av号"}
+
 if __name__ == "__main__":
-    parser = vocaloidparser()
-    #mode = unlimitVideo(parser)
-    mode = unlimitVideo()
+    print("请选择模式(输入全名):")
+    for index,mode in enumerate(modes.keys(),start=1):
+        print(index,mode,modesdesc[mode])
+    mode = input("输入名称")
+    try:
+        mode = modes[mode]()
+    except:
+        print("没有该模式")
+        sys.exit()
     mode.gntInput()
-    a = input("回车继续")
+    a = input("在生成的文件中进行填写，填写完之后按回车继续")
     mode.loadInput()
     mode.gntOutput()

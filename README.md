@@ -23,10 +23,11 @@ BiliBiliAddFavorite 是向自己的一个收藏夹里批量添加视频<br>
 Vocaloid 是关于b站中文Vocaloid的工具<br>
 嘛，当然基本上就我一个人会去用啦<br>
 具体去里面看啦<br>
+ps: rankhelper 重写(无情的抄榜助手)，添加了泛用性，特化型依旧保留.<br>
 <br>
 4.<br>
 BiliBili-EnablePIP<br>
-大概是给 mac用户+windows Chrome用户 做的<br>
+大概是给 mac用户+windows Chrome+油猴脚本用户 做的<br>
 在B站开启画中画的js脚本<br>
 <br>
 
