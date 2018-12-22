@@ -1,6 +1,5 @@
 // ==UserScript==
-// @name         BiliBili-EnablePIP-Dev
-// @namespace    None
+// @name         BiliBili-EnablePIP
 // @version      1.1.0
 // @description  Enable Picture in Picture mode in Bilibli 在b站中打开画中画模式，使chrome/safair能在b站使用画中画。
 // @author       LXG_Shadow
