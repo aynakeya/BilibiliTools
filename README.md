@@ -30,7 +30,13 @@ BiliBili-EnablePIP<br>
 大概是给 mac用户+windows Chrome+油猴脚本用户 做的<br>
 在B站开启画中画的js脚本<br>
 <br>
-
+5.<br>
+BilibiliAudioGet<br>
+船新小工具啊啊啊啊啊<br>
+一个类console版的bilibili音频站下载器<br>
+包括歌曲下载以及歌单下载<br>
+使用方法见文件夹内<br>
+<br>
 
 enjoy :)<br>
 <br>
