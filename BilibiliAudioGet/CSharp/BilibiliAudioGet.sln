@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.28307.271
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BilibiliAudioGet", "BilibiliAudioGet.csproj", "{074834E0-AC36-40D2-BE92-B1DAF36713E9}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{074834E0-AC36-40D2-BE92-B1DAF36713E9}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{074834E0-AC36-40D2-BE92-B1DAF36713E9}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{074834E0-AC36-40D2-BE92-B1DAF36713E9}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{074834E0-AC36-40D2-BE92-B1DAF36713E9}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {E72E8D6D-84F6-4DE6-87F2-2798740700DD}
+	EndGlobalSection
+EndGlobal
