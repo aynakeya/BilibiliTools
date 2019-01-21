@@ -25,6 +25,12 @@ audio https://www.bilibili.com/audio/au282881
 // 下载多个歌曲
 audio https://www.bilibili.com/audio/au282881 https://www.bilibili.com/audio/au18076
 ```
+<br>
+<br>
+Csharp 版<br>
+所需环境: .NET Framework 4.5<br>
+直接运行就完事了<br>
 
 <br>
 Jan.18.2019 : Fisrt Upload.<br>
+Jan.20.2019 : Add CSharp Version<br>
