@@ -34,12 +34,12 @@ namespace BilibiliAudioGet
 
                 string i = "";
                 int j = 0;
-                string path = appPath + "/Music/" + name + i + ".mp3";
+                string path = appPath + "/Music/" + name + i + ".m4a";
                 while (File.Exists(path))
                 {
                     j++;
                     i = j.ToString();
-                    path = appPath + "/Music/" + name + i + ".mp3";
+                    path = appPath + "/Music/" + name + i + ".m4a";
                 }
 
                 await HttpClient.DownloadFormUrl(durl, path);
