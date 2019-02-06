@@ -5,18 +5,22 @@ import json
 '''
 {"code":0,"message":"0","ttl":1} 收藏成功
 {"code":11007,"message":"你已经收藏过该视频！","ttl":1} 已收藏
+{'code': 11201, 'message': '已经收藏过了', 'ttl': 1}
 {"code":-111,"message":"csrf 校验失败","ttl":1} csrf 校验失败
 {"code":10003,"message":"不存在该稿件","ttl":1} 不存在该稿件
 {"code":-503,"message":"调用速度过快","ttl":1} 调用速度过快
 {"code":-404,"message":"啥都木有","ttl":1} 啥都没有
 {"code":-101,"message":"账号未登录","ttl":1} 账号未登录
+{'code': -509, 'message': '请求过于频繁，请稍后再试', 'ttl': 1}
 '''
 
 codes = {'0':(0,'收藏成功'),
          '11007':(0,"你已经收藏过该视频！"),
+         '11201':(0,"已经收藏过了"),
          '10003':(1,"不存在该稿件"),
          '-404':(1,"啥都木有"),
          '-503':(2,"调用速度过快"),
+         '-509':(2,"请求过于频繁，请稍后再试"),
          '-111':(-1,"csrf 校验失败"),
          '-101':(-1,"账号未登录,可能是cookie过期")}
 
@@ -78,6 +82,9 @@ if __name__=="__main__":
                     print("Sleep for 3 sec")
                     time.sleep(3)
                     code, msg = addfav(av)
+                    if not code in codes:
+                        print("Unexceppt Error: %s:" % msg)
+                        continue
                     pattern, msg = codes[code]
                     print("重试第%s个，添加视频av%s到收藏夹%s---返回信息:%s(code:%s)" % (aid.index(av)+1,av, fid, msg, code))
             if pattern == -1:
