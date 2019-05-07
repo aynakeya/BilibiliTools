@@ -13,6 +13,7 @@ help : show help 显示帮助<br>
 quit : Quit 退出<br>
 参数<br>
 -l/--lyric : download lyric (If have) 下载歌词<br>
+-q : choose the song quality from 0 to 2, higher the value, higher the quality (if you want) 选择音质0-128k,1-192k,3-320k<br>
 --disable-audio : do not download audio 不下载音乐<br>
 <br>
 Exmaple<br>
@@ -34,3 +35,4 @@ Csharp 版<br>
 <br>
 Jan.18.2019 : Fisrt Upload.<br>
 Jan.20.2019 : Add CSharp Version<br>
+Jan.20.2019 : Change api, support quality choose<br>

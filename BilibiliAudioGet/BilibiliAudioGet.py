@@ -1,11 +1,15 @@
 import re,requests,random,os,sys,getopt,time
 
 class songDownloader(object):
-    fileApi = "https://www.bilibili.com/audio/music-service-c/web/url?privilege=2&quality=2&sid=%s"
+    #fileApi = "https://www.bilibili.com/audio/music-service-c/web/url?privilege=2&quality=2&sid=%s"
+    fileApi = "http://api.bilibili.com/audio/music-service-c/url?mid=8047632&mobi_app=iphone&platform=ios&privilege=2&quality=%s&songid=%s"
     infoApi = "https://www.bilibili.com/audio/music-service-c/web/song/info?sid=%s"
-    headers = {"user-agent":"Mozilla/5.0 (Windows NT 10.0; WOW64; rv:60.0) Gecko/20100101 Firefox/60.0"}
-    def __init__(self,sid):
+    headers = {"user-agent":"BilibiliClient/2.33.3",
+                'Accept': "*/*",
+                'Connection': "keep-alive"}
+    def __init__(self,sid,quality):
         self.sid = sid
+        self.quality = quality
         self.title = ""
         self.author = ""
         self.lyric = ""
@@ -14,12 +18,12 @@ class songDownloader(object):
 
 
     @classmethod
-    def initFormUrl(cls,url):
+    def initFormUrl(cls,url,quality=2):
         exp = "au[1-9]\d*"
         sid = re.search(exp,url)
         if sid == None:
-            return cls("")
-        return cls(sid.group()[2::])
+            return cls("",quality)
+        return cls(sid.group()[2::],quality)
 
     def getInfo(self):
         try:
@@ -34,13 +38,14 @@ class songDownloader(object):
 
     def getCdns(self):
         try:
-            song_data = requests.get(self.fileApi % self.sid, headers=self.headers).json()
+            song_data = requests.get(self.fileApi % (self.quality,self.sid), headers=self.headers).json()
             self.cdns = song_data["data"]["cdns"]
             return 0
         except:
             return 1
 
     def downloadAudio(self,dir=""):
+        tried = 0
         self.getCdns()
         if len(self.cdns) == 0:
             return 3
@@ -53,9 +58,12 @@ class songDownloader(object):
                     fmt = i
             data= requests.get(url,headers = self.headers).content
             while len(data) < 100000:
+                if tried >=5 :
+                    return 2
                 time.sleep(0.5)
                 url = random.choice(self.cdns)
                 data = requests.get(url, headers=self.headers).content
+                tried += 1
 
             pattern = r'[\\/:*?"<>|\r\n]+'
             filename = re.sub(pattern, "-", "-".join([self.title,self.author,self.sid])+fmt)
@@ -96,7 +104,8 @@ class playlistDownloader(object):
             return cls("")
         return cls(sid.group()[2::])
 
-    def getSongs(self):
+    def getSongs(self,quality=2):
+        self.songs = []
         try:
             pn = 1
             api = self.infoApi % (self.sid,"%s")
@@ -104,7 +113,7 @@ class playlistDownloader(object):
                 url = api % pn
                 data = requests.get(url,self.headers).json()
                 for song in data["data"]["data"]:
-                    temp = songDownloader(str(song["id"]))
+                    temp = songDownloader(str(song["id"]),quality)
                     temp.title = song["title"]
                     temp.author = song["author"]
                     temp.lyric = song["lyric"]
@@ -161,9 +170,10 @@ if __name__ == "__main__":
         "help":"show help",
         "quit":"Quit"
     }
-    console_options = ["-l/--lyric","--disable-audio"]
+    console_options = ["-l/--lyric","-q/--quality","--disable-audio"]
     console_options_desc = {
         "-l/--lyric": "download lyric (If have)",
+        "-q/--quality": "choose the song quality from 0 to 2, higher the value, higher the quality",
         "--disable-audio": "do not download audio"
     }
     while True:
@@ -182,23 +192,33 @@ if __name__ == "__main__":
                 print(i,":",console_options_desc[i])
             continue
         try:
-            options, args = getopt.getopt(command.split(" ")[1:], "l", ["lyric","disable-audio"])
+            options, args = getopt.getopt(command.split(" ")[1:], "lq:", ["lyric","disable-audio"])
         except:
             print("illegal option")
             continue
 
         download = [True,False]
+        quality = "2"
         for key, value in options:
             if key == "-l" or key == "--lyric":
                 download[1] = True
             if key == "--disable-audio":
                 download[0] = False
+            if key == "-q":
+                quality = value
+
+        if quality == "1" or quality == "2" or quality == "0":
+        	pass
+        else:
+        	print("illegal value")
+        	continue
+
 
         if method == "audio":
             for s in args:
                 if s == "":
                     continue
-                song = songDownloader.initFormUrl(s)
+                song = songDownloader.initFormUrl(s,quality=quality)
                 if song.sid == "":
                     printError(s)
                     continue
@@ -222,10 +242,10 @@ if __name__ == "__main__":
                 if playlist.sid == "":
                     printError(s)
                     continue
-                playlist.getSongs()
+                playlist.getSongs(quality=quality)
                 playlist.downloadAll(download)
 
-# url = "https://www.bilibili.com/audio/au542902"
+# url = "https://www.bilibili.com/audio/au241921"
 # a = songDownloader.initFormUrl(url)
 # a.getInfo()
 # print(a.downloadAudio())
