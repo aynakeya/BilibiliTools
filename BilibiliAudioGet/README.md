@@ -9,6 +9,7 @@ bilibili音乐站下载器<br>
 命令<br>
 audio : download a audio file(s) by enter url 下载歌曲<br>
 playlist : download a playlist 下载歌单<br>
+user : playlist : download all the song of a user 下载up主的所有歌曲<br>
 help : show help 显示帮助<br>
 quit : Quit 退出<br>
 参数<br>
@@ -21,6 +22,8 @@ Exmaple<br>
 ```
 // 下载歌单
 playlist https://www.bilibili.com/audio/am84371
+// 下载up主所有的歌曲
+user https://space.bilibili.com/2932528/audio
 // 下载歌曲
 audio https://www.bilibili.com/audio/au282881
 // 下载多个歌曲
