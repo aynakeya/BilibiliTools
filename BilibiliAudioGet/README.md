@@ -39,3 +39,4 @@ Csharp 版<br>
 Jan.18.2019 : Fisrt Upload.<br>
 Jan.20.2019 : Add CSharp Version<br>
 Jan.20.2019 : Change api, support quality choose<br>
+Mar.25.2019 : Fix bug in CSharp<br>
