@@ -16,12 +16,11 @@ namespace BilibiliAudioGet
         public async Task<string> GetFromUrl(string url)
         {
 
-            HttpClient client = new HttpClient();
-            client.DefaultRequestHeaders.Add("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36");
+            HttpClient client = new HttpClient(new HttpClientHandler() { AutomaticDecompression = DecompressionMethods.GZip });
+            client.DefaultRequestHeaders.Add("User-Agent", "BilibiliAudioGet/2.33.33");
             try
             {
                 string response = await client.GetStringAsync(url);
-
                 return response;
             }
             catch
@@ -32,8 +31,8 @@ namespace BilibiliAudioGet
 
         public async Task<string> DownloadFormUrl(string url, string path)
         {
-            HttpClient client = new HttpClient();
-            client.DefaultRequestHeaders.Add("User-Agent", "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/71.0.3578.98 Safari/537.36");
+            HttpClient client = new HttpClient(new HttpClientHandler() { AutomaticDecompression = DecompressionMethods.GZip });
+            client.DefaultRequestHeaders.Add("User-Agent", "BilibiliAudioGet/2.33.33");
             try
             {
                 var response = await client.GetAsync(url);

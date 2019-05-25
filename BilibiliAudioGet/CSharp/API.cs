@@ -20,13 +20,12 @@ namespace BilibiliAudioGet
 
         private async Task<int> Download(string id, string name, string appPath)
         {
-            string api = "https://www.bilibili.com/audio/music-service-c/web/url?&privilege=2&quality=2&sid=";
+            string api = "http://api.bilibili.com/audio/music-service-c/url?mid=1&mobi_app=iphone&platform=ios&privilege=2&quality=2&songid=";
             string url = api + id;
 
             string json = await HttpClient.GetFromUrl(url);
-
+            
             JObject jsonReader = JObject.Parse(json);
-
 
             if (jsonReader["code"].ToString() == "0")
             {

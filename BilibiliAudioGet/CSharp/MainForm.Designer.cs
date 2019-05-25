@@ -77,7 +77,7 @@
             this.InputBox.ForeColor = System.Drawing.SystemColors.WindowText;
             this.InputBox.Location = new System.Drawing.Point(42, 60);
             this.InputBox.Name = "InputBox";
-            this.InputBox.Size = new System.Drawing.Size(636, 38);
+            this.InputBox.Size = new System.Drawing.Size(636, 28);
             this.InputBox.TabIndex = 0;
             // 
             // DownloadList
@@ -85,7 +85,7 @@
             this.DownloadList.Font = new System.Drawing.Font("Microsoft JhengHei UI Light", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
             this.DownloadList.ForeColor = System.Drawing.Color.Gray;
             this.DownloadList.FormattingEnabled = true;
-            this.DownloadList.ItemHeight = 30;
+            this.DownloadList.ItemHeight = 20;
             this.DownloadList.Location = new System.Drawing.Point(42, 142);
             this.DownloadList.Name = "DownloadList";
             this.DownloadList.Size = new System.Drawing.Size(635, 364);
@@ -126,9 +126,9 @@
             this.Label.ForeColor = System.Drawing.SystemColors.GrayText;
             this.Label.Location = new System.Drawing.Point(37, 14);
             this.Label.Name = "Label";
-            this.Label.Size = new System.Drawing.Size(219, 30);
+            this.Label.Size = new System.Drawing.Size(155, 20);
             this.Label.TabIndex = 12;
-            this.Label.Text = "BilibiliAudioGet 1.01";
+            this.Label.Text = "BilibiliAudioGet 1.03";
             // 
             // StatusLabel
             // 
@@ -137,7 +137,7 @@
             this.StatusLabel.ForeColor = System.Drawing.SystemColors.GrayText;
             this.StatusLabel.Location = new System.Drawing.Point(37, 527);
             this.StatusLabel.Name = "StatusLabel";
-            this.StatusLabel.Size = new System.Drawing.Size(221, 30);
+            this.StatusLabel.Size = new System.Drawing.Size(151, 20);
             this.StatusLabel.TabIndex = 13;
             this.StatusLabel.Text = "Apache License 2.0";
             // 
