@@ -5,6 +5,7 @@ Bilibili Tools<br>
 其实都是为了我自己要用才写的<br>
 然后就顺便传上来了啦<br>
 请各位大神们指出我的错误哦<br>
+有Issue记得发issue啊！！！！<br>
 <br>
 <br>
 Index:<br>
