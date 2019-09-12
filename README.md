@@ -38,6 +38,10 @@ BilibiliAudioGet<br>
 包括歌曲下载以及歌单下载<br>
 使用方法见文件夹内<br>
 <br>
+6.<br>
+baseModel.py<br>
+做好的脚手架<br>
+<br>
 
 enjoy :)<br>
 <br>
