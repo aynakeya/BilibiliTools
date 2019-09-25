@@ -21,6 +21,16 @@ bilibili聚合下载神器
 
 未来将会支持下载番剧。
 
+(你说的不是you-get嘛？)
+
+当然不是，you-get 1mb不到的现在速度有个鸡儿用。
+
+本程序支持aria2下载，跑满带宽，巨鸡儿牛皮。
+
+（演示视频呢）
+
+被pilipili退回了。
+
 <br>
 1.<br>
 BilibiliGetFavorite 是获取某公开收藏夹里所有视频的工具<br>
