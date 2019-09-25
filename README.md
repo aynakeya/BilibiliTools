@@ -10,6 +10,18 @@ Bilibili Tools<br>
 <br>
 Index:<br>
 <br>
+0.<br>
+重磅推出
+
+Bilidownloader!!!
+
+bilibili聚合下载神器
+
+支持视频，封面，收藏夹，音乐，歌词，音乐封面。
+
+未来将会支持下载番剧。
+
+<br>
 1.<br>
 BilibiliGetFavorite 是获取某公开收藏夹里所有视频的工具<br>
 如果装了you-get的话，可以下载的说<br>
