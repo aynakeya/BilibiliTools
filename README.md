@@ -17,7 +17,7 @@
 - biliFavExtractor.py: 收藏夹信息导出
 
 ---
-## config.py
+### config.py
 
 **配置文件**
 
@@ -57,7 +57,7 @@ class Config:
 
 
 ---
-## biliget.py
+### biliget.py
 
 **console 版本的bilibili聚合下载器**
 
@@ -74,7 +74,7 @@ class Config:
 *被pilipili退回了。*
 
 ---
-## biliFavExtractor.py
+### biliFavExtractor.py
 
 **收藏夹信息导出**
 
