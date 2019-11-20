@@ -8,7 +8,7 @@
 欢迎各位的 star 和 fork.
 
 ---
-##Introduction
+## Introduction
 
 *old 是重写前的版本*
 
@@ -17,7 +17,7 @@
 - biliFavExtractor.py: 收藏夹信息导出
 
 ---
-##config.py
+## config.py
 
 **配置文件**
 
@@ -57,7 +57,7 @@ class Config:
 
 
 ---
-##biliget.py
+## biliget.py
 
 **console 版本的bilibili聚合下载器**
 
@@ -74,7 +74,7 @@ class Config:
 *被pilipili退回了。*
 
 ---
-##biliFavExtractor.py
+## biliFavExtractor.py
 
 **收藏夹信息导出**
 
@@ -96,6 +96,6 @@ Options:
 
 
 ---
-##更新日记 Change Log:
+## 更新日记 Change Log:
 
 2019/11/20: 开始重写
