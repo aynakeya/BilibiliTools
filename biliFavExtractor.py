@@ -6,7 +6,7 @@ if __name__ == "__main__":
     svrt = Config.saveroute
     number = None
     try:
-        options, args = getopt.getopt(sys.argv[1:], "s:n:", ["saveroute=", "number="])
+        options, args = getopt.getopt(sys.argv[1:], "hs:n:", ["help","saveroute=", "number="])
     except:
         print("illegal option")
         sys.exit()
