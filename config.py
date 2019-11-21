@@ -12,10 +12,9 @@ class Config:
     #if no token provide, using None
     aria2token = None
 
-    defaultDownloader = "requests"
+    defaultDownloader = "aria2"
 
-    #useDownloader = ["aria2","requests"]
-    useDownloader = ["requests"]
+    useDownloader = ["aria2","requests"]
 
     useModules  = ["infoEditor"]
 
