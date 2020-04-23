@@ -86,14 +86,13 @@ if __name__ == "__main__":
                 m.getInfo()
                 if m.isValid():
                     print("--")
-                    for key,value in m.dumpInfo():
+                    for key, value in m.dumpInfo():
                         print("%s:" % key)
                         print("%s" % value)
                     print("--")
                 else:
                     print("this url may not be available now")
             continue
-
 
         try:
             options, args = getopt.getopt(command.split(" ")[1:], "lcdq:m:",
@@ -102,7 +101,6 @@ if __name__ == "__main__":
         except:
             print("illegal option")
             continue
-
 
         kwargs = {}
         # todo default config
