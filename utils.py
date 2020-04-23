@@ -1,5 +1,4 @@
 import re,requests
-from models.biliVideo import biliVideo
 
 def filenameparser(filename):
     pattern = r'[\\/:*?"<>|\r\n]+'
@@ -27,6 +26,9 @@ def httpPost(url, maxReconn=5, **kwargs):
 
 
 class videoIdConvertor():
+    videoUrl = "https://www.bilibili.com/video/%s"
+    patternAv = r"av[0-9]+"
+    patternBv = r"BV[0-9,A-Z,a-z]+"
     table = 'fZodR9XQDSUm21yCkr6zBqiveYah8bt4xsWpHnJE7jL5VG3guMTKNPAwcF'
     tr = dict(("fZodR9XQDSUm21yCkr6zBqiveYah8bt4xsWpHnJE7jL5VG3guMTKNPAwcF"[i], i) for i in range(58))
     s = [11, 10, 3, 8, 4, 6]
@@ -50,8 +52,8 @@ class videoIdConvertor():
 
     @classmethod
     def urlConvert(cls, url):
-        if re.search(biliVideo.patternBv, url):
-            return biliVideo.videoUrl % ("av%s" % cls.bv2av(re.search(biliVideo.patternBv, url).group()))
-        if re.search(biliVideo.patternAv, url):
-            return biliVideo.videoUrl % cls.av2bv(int(re.search(biliVideo.patternAv, url).group()[2::]))
+        if re.search(cls.patternBv, url):
+            return cls.videoUrl % ("av%s" % cls.bv2av(re.search(cls.patternBv, url).group()))
+        if re.search(cls.patternAv, url):
+            return cls.videoUrl % cls.av2bv(int(re.search(cls.patternAv, url).group()[2::]))
         return ""
