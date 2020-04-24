@@ -4,7 +4,7 @@ class Config:
         "user-agent": "Mozilla/5.0 (Windows NT 10.0; WOW64; rv:51.0) Gecko/20100101 Firefox/51.0",
     }
     commonCookies = {
-                     "SESSDATA":"027e79df%2C1599242793%2C2184b*31",
+                     "SESSDATA":"",
     }
     saveroute = r"D:\Download\bilidown"
 
