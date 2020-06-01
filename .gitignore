@@ -333,3 +333,4 @@ ASALocalRun/
 .mfractor/
 
 .DS_Store
+/venv/

@@ -6,11 +6,12 @@ import re, sys, getopt
 
 availableDl = {}
 
-console_method = ["dl", "help", "convert", "quit"]
+console_method = ["dl", "info", "help", "convert", "quit"]
 console_method_desc = {
     "dl": "start to download。\n    support: video, media list, audio, audio list",
+    "infor": "Print out basic information.",
     "help": "show help",
-    "convert" : "convert between bv and av",
+    "convert": "convert between bv and av",
     "quit": "Quit"
 }
 console_option = ["-l/--lyric", "-q/--quality", "-c/--cover", "-d/--danmu", "-m/--maxnumber", "--ignore",
@@ -68,11 +69,29 @@ if __name__ == "__main__":
                 print(i, ":", console_option_desc[i])
             continue
         if method == "convert":
-            for url in command.split(" ")[1:]:
+            for url in [s for s in command.split(" ")[1:] if s != ""]:
                 urla = videoIdConvertor.urlConvert(url)
                 if urla == "":
                     continue
                 print("%s -> %s" % (url, urla))
+            continue
+
+        if method == "info":
+            for url in [s for s in command.split(" ")[1:] if s != ""]:
+                print("Start to get information of %s" % url)
+                m = autoSelector(url).initFromUrl(url) if autoSelector(url) != None else None
+                if m == None:
+                    print("Url not support")
+                    continue
+                m.getInfo()
+                if m.isValid():
+                    print("--")
+                    for key, value in m.dumpInfo():
+                        print("%s:" % key)
+                        print("%s" % value)
+                    print("--")
+                else:
+                    print("this url may not be available now")
             continue
 
         try:

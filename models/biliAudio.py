@@ -45,11 +45,21 @@ class biliAudio(object):
         data = data.json()
         try:
             self.title = data["data"]["title"]
-            self.author = data["data"]["author"]
+            self.uploader = data["data"]["author"]
             self.lyric = data["data"]["lyric"]
             self.cover = data["data"]["cover"]
         except:
             pass
+
+    def getQualities(self):
+        quality = {}
+        data = httpConnect(self.fileApi % ("2", self.sid), headers=self.headers)
+        if data == None:
+            return quality
+        data = data.json()
+        for q in data["data"]["qualities"]:
+           quality[q["type"]] = (q["tag"], q["bps"] ,q["desc"])
+        return quality
 
     def getCdns(self, quality=2):
         data = httpConnect(self.fileApi % (quality, self.sid), headers=self.headers)
@@ -76,6 +86,14 @@ class biliAudio(object):
                 downloader.download(self.cover, Config.saveroute,".".join([self.title, suffix]),
                               headers=self.headers)
 
+    def dumpInfo(self):
+        qs = ""
+        for key,value in self.getQualities().items():
+            qs += "%s: %s(%s %s)\n" % (key,value[2],value[0],value[1])
+        return [("Type",self.name),
+                ("Title",self.title),
+                ("Uploader",self.uploader),
+                ("Available Qualities",qs)]
     def isValid(self):
         return True if self.title != "" else False
 
@@ -126,6 +144,9 @@ class biliAudioList(object):
         for audio in self.audio:
             audio.download(downloader=downloader,**kwargs)
 
+    def dumpInfo(self):
+        return [("Type", self.name),
+                ("Audio number", len(self.audio))]
 
     def isValid(self):
         return True if len(self.audio)>0 else False

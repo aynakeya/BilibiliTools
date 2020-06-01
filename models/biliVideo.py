@@ -1,4 +1,4 @@
-from utils import httpConnect, httpPost, filenameparser, videoIdConvertor
+from utils import httpConnect, httpPost, videoIdConvertor
 from config import Config
 from downloaders import downloaders
 import re, random
@@ -135,6 +135,17 @@ class biliVideo():
             downloaders["requests"]().download(self.dmApi % self.getPageCid(page), Config.saveroute,
                                                ".".join([self.title, "xml"]))
 
+    def dumpInfo(self):
+        qs = ""
+        for key,value in self.getQualities().items():
+            qs += "%s: %s(%s)\n" %(key,value[1],value[0])
+        return [("Type",self.name),
+                ("Title", self.title),
+                ("Uploader", self.uploader),
+                ("Total page", len(self.pages)),
+                ("Available Qualities",qs)
+                ]
+
     def isValid(self):
         if self.status == 404: return False
         return True if len(self.pages) > 0 else False
@@ -201,6 +212,13 @@ class biliVideoList():
         video: biliVideo
         for video in self.videos:
             video.download(downloader=downloader, **kwargs)
+
+
+    def dumpInfo(self):
+        return [("Type",self.name),
+                ("Media_id", self.media_id),
+                ("Videoo number", len(self.videos))
+                ]
 
     def isValid(self):
         return True if len(self.videos) > 0 else False
