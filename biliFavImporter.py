@@ -1,6 +1,8 @@
 from models import biliVideoList,biliVideo
 import getopt,sys,os,time
 
+# Not support BV
+
 if __name__ == "__main__":
     try:
         options, args = getopt.getopt(sys.argv[1:], "d:a:", ["data="])

@@ -1,4 +1,4 @@
-from utils import httpConnect,httpPost, filenameparser
+from utils import httpConnect, httpPost, filenameparser, videoIdConvertor
 from config import Config
 from downloaders import downloaders
 import re, random
@@ -7,16 +7,19 @@ import re, random
 class biliVideo():
     name = "video"
 
-    pattern = r"av[0-9]+"
+    patternAv = r"av[0-9]+"
+    patternBv = r"BV[0-9,A-Z,a-z]+"
 
-    videoUrl = "https://www.bilibili.com/video/av%s"
-    pagesApi = "https://www.bilibili.com/widget/getPageList?aid=%s"
-    detailApi = "https://api.bilibili.com/x/web-interface/view/detail?aid=%s&jsonp=jsonp"
-    playurlApi = "https://api.bilibili.com/x/player/playurl?avid=%s&cid=%s&qn=%s&type=&otype=json"
+    #videoUrl = "https://www.bilibili.com/video/av%s"
+    videoUrl = "https://www.bilibili.com/video/%s"
+    #pagesApi = "https://www.bilibili.com/widget/getPageList?aid=%s"
+    pagesApi = "https://api.bilibili.com/x/player/pagelist?bvid=%s"
+    detailApi = "https://api.bilibili.com/x/web-interface/view/detail?bvid=%s&aid=&jsonp=jsonp"
+    playurlApi = "https://api.bilibili.com/x/player/playurl?avid=&bvid=%s&cid=%s&qn=%s&type=&otype=json"
     dmApi = "https://api.bilibili.com/x/v1/dm/list.so?oid=%s"
 
-    def __init__(self, aid):
-        self.aid = aid
+    def __init__(self, bid):
+        self.bid = bid
         self.pages = []
         self.title = ""
         self.uploader = ""
@@ -25,21 +28,28 @@ class biliVideo():
 
     @classmethod
     def applicable(cls, url):
-        return re.search(cls.pattern, url) != None
+        return re.search(cls.patternAv, url) != None or re.search(cls.patternBv, url) != None
 
     @classmethod
-    def initFromAid(cls, aid):
-        v = cls(aid)
-        return v
+    def initFromId(cls, id):
+        bid = ""
+        if "BV" in id:
+            bid = id
+        if "av" in id:
+            bid = videoIdConvertor.av2bv(id)
+        return cls(bid)
 
     @classmethod
     def initFromUrl(cls, url):
-        pattern = r"av[0-9]+"
-        return cls(re.search(pattern, url).group()[2::]) if re.search(pattern, url) != None else cls("")
+        if re.search(cls.patternBv, url):
+            return cls(re.search(cls.patternBv, url).group())
+        if re.search(cls.patternAv, url):
+            return cls(videoIdConvertor.av2bv(re.search(cls.patternAv, url).group()[2::]))
+        return cls("")
 
     @classmethod
-    def initFromData(cls, aid, title, uploader, cover, pages):
-        v = cls(aid)
+    def initFromData(cls, id, title, uploader, cover, pages):
+        v = cls.initFromId(id)
         v.title = title
         v.uploader = uploader
         v.cover = cover
@@ -47,13 +57,14 @@ class biliVideo():
         return v
 
     def getPages(self):
-        data = httpConnect(self.pagesApi % self.aid)
-        if data == None:
+        data = httpConnect(self.pagesApi % self.bid)
+        if data == None or data.json()["code"] != 0:
             return
-        self.pages = data.json()
+        self.pages = [{"page":d["page"],"pagename" :d["part"],"cid":d["cid"]} for d in data.json()["data"]]
+
 
     def getInfo(self, **kwargs):
-        data = httpConnect(self.detailApi % self.aid)
+        data = httpConnect(self.detailApi % self.bid)
         if data == None: return
         data = data.json()
         try:
@@ -77,7 +88,7 @@ class biliVideo():
         cid = self.getPageCid(page)
         if cid == 0:
             return quality
-        data = httpConnect(self.playurlApi % (self.aid, cid, 32))
+        data = httpConnect(self.playurlApi % (self.bid, cid, 32))
         if data == None:
             return quality
         data = data.json()
@@ -91,7 +102,7 @@ class biliVideo():
         cid = self.getPageCid(page)
         if cid == 0:
             return {}
-        data = httpConnect(self.playurlApi % (self.aid, cid, qn), headers=Config.commonHeaders,
+        data = httpConnect(self.playurlApi % (self.bid, cid, qn), headers=Config.commonHeaders,
                            cookies=Config.commonCookies)
         if data == None:
             return {}
@@ -113,12 +124,12 @@ class biliVideo():
             url = data["urls"][0]
             suffix = url.split("?")[0].split(".")[-1]
             downloader.download(url, Config.saveroute, ".".join([self.title + " - " + self.uploader, suffix]),
-                                headers={"origin": "www.bilibili.com", "referer": self.videoUrl % self.aid,
+                                headers={"origin": "www.bilibili.com", "referer": self.videoUrl % self.bid,
                                          "user-agent": Config.commonHeaders["user-agent"]})
         if cover:
             suffix = self.cover.split("?")[0].split(".")[-1]
             downloader.download(self.cover, Config.saveroute, ".".join([self.title, suffix]),
-                                headers={"origin": "www.bilibili.com", "referer": self.videoUrl % self.aid,
+                                headers={"origin": "www.bilibili.com", "referer": self.videoUrl % self.bid,
                                          "user-agent": Config.commonHeaders["user-agent"]})
         if damu:
             downloaders["requests"]().download(self.dmApi % self.getPageCid(page), Config.saveroute,
@@ -134,8 +145,11 @@ class biliVideoList():
 
     pattern = r"fid=[0-9]+"
 
-    favApi = "https://api.bilibili.com/medialist/gateway/base/spaceDetail?ps=20&jsonp=jsonp&media_id=%s&pn=%s"
-    addApi = "https://api.bilibili.com/medialist/gateway/coll/resource/deal"
+    #favApi = "https://api.bilibili.com/medialist/gateway/base/spaceDetail?ps=20&jsonp=jsonp&media_id=%s&pn=%s"
+    favApi = "https://api.bilibili.com/x/v3/fav/resource/list?ps=20&jsonp=jsonp&media_id=%s&pn=%s"
+    #addApi = "https://api.bilibili.com/medialist/gateway/coll/resource/deal"
+    addApi = "https://api.bilibili.com/x/v3/fav/resource/deal"
+
 
     def __init__(self, media_id):
         self.media_id = media_id
@@ -155,7 +169,7 @@ class biliVideoList():
         pn = 1
         num = 0
         while True:
-            data = httpConnect(self.favApi % (self.media_id, pn), headers=Config.commonHeaders)
+            data = httpConnect(self.favApi % (self.media_id, pn), cookies=Config.commonCookies, headers=Config.commonHeaders)
             if data == None: return
             data = data.json()
             if data["data"]["info"]["media_count"] == 0:
@@ -163,13 +177,15 @@ class biliVideoList():
             for media in data["data"]["medias"]:
                 if num >= maxNum:
                     return
-                aid = media["id"]
+                bid = media["bvid"]
                 title = media["title"]
                 cover = media["cover"]
                 uploader = media["upper"]["name"]
-                pages = [{"page": p["page"], "pagename": p["title"], "cid": p["id"]} for p in media["pages"]]
-                v = biliVideo.initFromData(aid, title, uploader, cover, pages)
-                if media["attr"] == 9:
+                #pages = [{"page": p["page"], "pagename": p["title"], "cid": p["id"]} for p in media["pages"]]
+                v = biliVideo.initFromData(bid, title, uploader, cover, [])
+                if media["attr"] == 0:
+                    v.getPages()
+                else:
                     v.status = 404
                 self.videos.append(v)
                 num += 1
@@ -191,7 +207,12 @@ class biliVideoList():
 
     def addVideo(self, aid):
         data = httpPost(self.addApi,
-                           headers={"origin": "https://www.bilibili.com", "referer": "https://www.bilibili.com"},
-                           cookies=Config.commonCookies,
-                           data={'rid': int(aid), 'type': 2,'add_media_ids': int(self.media_id),'del_media_ids': "",'jsonp': 'jsonp'})
+                        headers={"origin": "https://www.bilibili.com", "referer": "https://www.bilibili.com"},
+                        cookies=Config.commonCookies,
+                        data={'rid': int(aid), 'type': 2, 'add_media_ids': int(self.media_id), 'del_media_ids': "",
+                              'jsonp': 'jsonp'})
         return data.json() if data != None else None
+
+
+class biliBangumi():
+    name = "bangumi"

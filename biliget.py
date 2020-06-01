@@ -1,46 +1,52 @@
 from config import Config
 from downloaders import downloaders as adls
 from models import models as amdls
-import re,sys,getopt
+from utils import videoIdConvertor
+import re, sys, getopt
 
 availableDl = {}
 
-console_method = ["dl", "help", "quit"]
+console_method = ["dl", "help", "convert", "quit"]
 console_method_desc = {
-    "dl": "start to download。\nsupport: video, media list, audio, audio list",
+    "dl": "start to download。\n    support: video, media list, audio, audio list",
     "help": "show help",
+    "convert" : "convert between bv and av",
     "quit": "Quit"
 }
-console_option = ["-l/--lyric", "-q/--quality", "-c/--cover","-d/--danmu","-m/--maxnumber","--ignore"]
+console_option = ["-l/--lyric", "-q/--quality", "-c/--cover", "-d/--danmu", "-m/--maxnumber", "--ignore",
+                  "--downloader"]
 console_option_desc = {
     "-l/--lyric": "download lyric (If have)",
     "-c/--cover": "download cover (If have)",
     "-d/--danmu": "download damu (If have)",
-    "-m/--maxnumber":"set the max number of audio or video in a playlist you want to download",
-    "--ignore":"ignore download anything that is not chosen by user. eg. \"-c --ignore\" will only download cover and skip video file or audio file",
-    "--downloader": "use specific downloader.\n"+
-                    "Available downloaders:\n"+
+    "-m/--maxnumber": "set the max number of audio or video in a playlist you want to download",
+    "--ignore": "ignore download anything that is not chosen by user. eg. \"-c --ignore\" will only download cover and skip video file or audio file",
+    "--downloader": "use specific downloader.\n" +
+                    "Available downloaders:\n" +
                     "· aria2 - aria2\n· requests - native requests downloader",
     "-q/--quality": "choose the quality.\n" +
                     "Available Audio Quality:\n" +
-                    "· 2 - 320k 高品质\n· 1 - 196k 标准\n· 0 - 128k 流畅" +
+                    "· 2 - 320k 高品质\n· 1 - 196k 标准\n· 0 - 128k 流畅\n" +
                     "Available Video Video Quality:\n" +
-                    "· 116 - 高清 1080P60(SESSDATA required)\n· 112 - 高清 1080P+(SESSDATA required)\n"+
-                    "· 80 - 高清 1080P(SESSDATA required)\n· 74 - 高清 720P60\n(SESSDATA required)" +
-                    "· 64 - 高清 720P(SESSDATA required)\n· 48 - 高清 720P (MP4)(SESSDATA required)\n"+
+                    "· 116 - 高清 1080P60(SESSDATA required)\n· 112 - 高清 1080P+(SESSDATA required)\n" +
+                    "· 80 - 高清 1080P(SESSDATA required)\n· 74 - 高清 720P60(SESSDATA required)\n" +
+                    "· 64 - 高清 720P(SESSDATA required)\n· 48 - 高清 720P (MP4)(SESSDATA required)\n" +
                     "· 32 - 清晰 480P\n· 16 - 流畅 360P"
 }
+
 
 def initDownloaders():
     for dl in Config.useDownloader:
         if adls.get(dl) is not None:
-            availableDl[adls.get(dl).name]=adls.get(dl)()
+            availableDl[adls.get(dl).name] = adls.get(dl)()
+
 
 def autoSelector(url):
     for m in amdls.values():
         if m.applicable(url):
             return m
     return None
+
 
 if __name__ == "__main__":
     initDownloaders()
@@ -54,23 +60,31 @@ if __name__ == "__main__":
             print("Stop console")
             sys.exit()
         if method == "help":
-            print("Methods:")
+            print("\nMethods:")
             for i in console_method:
                 print(i, ":", console_method_desc[i])
-            print("\n\n\nOptions")
+            print("\nOptions")
             for i in console_option:
                 print(i, ":", console_option_desc[i])
+            continue
+        if method == "convert":
+            for url in command.split(" ")[1:]:
+                urla = videoIdConvertor.urlConvert(url)
+                if urla == "":
+                    continue
+                print("%s -> %s" % (url, urla))
             continue
 
         try:
             options, args = getopt.getopt(command.split(" ")[1:], "lcdq:m:",
-                                          ["lyric", "cover", "quality", "danmu", "downloader", "maxnumber", "ignore"])
+                                          ["lyric", "cover", "quality=", "danmu", "downloader=", "maxnumber=",
+                                           "ignore"])
         except:
             print("illegal option")
             continue
 
         kwargs = {}
-        #todo default config
+        # todo default config
         kwargs["qn"] = Config.defaultQuality
         kwargs["downloader"] = availableDl.get(Config.defaultDownloader)
         for key, value in options:
