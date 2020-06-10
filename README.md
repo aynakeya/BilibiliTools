@@ -44,12 +44,13 @@ class Config:
 	# 默认下载器，默认使用requests
     defaultDownloader = "requests"
 	
-	# 可使用的下载器，如果装了aira2，建议把aria2加上
-    #useDownloader = ["aria2","requests"]
-    useDownloader = ["requests"]
+	# 可使用的下载器
+    # Available: aria2, requests
+    useDownloader = {"aria2":True,
+                     "requests":True}
 	
 	# 可使用的模块，目前只有一个音乐文件tag编辑器，还没有完全做好
-    useModules  = ["infoEditor"]
+    # useModules  = ["infoEditor"]
 	
 	# 默认下载质量
     defaultQuality = 116
@@ -63,7 +64,7 @@ class Config:
 
 支持视频，封面，收藏夹，音乐，歌词，音乐封面.
 
-未来将会支持下载番剧.
+支持下载番剧.
 
 支持aria2,以及原生python下载.
 
