@@ -21,6 +21,7 @@ console_option_desc = {
     "-l/--lyric": "download lyric (If have)",
     "-c/--cover": "download cover (If have)",
     "-d/--danmu": "download damu (If have)",
+    "-a/--all" : "download all page (if have) in the video",
     "-p/--page" : "download specfic page of the video",
     "-m/--maxnumber": "set the max number of audio or video in a playlist you want to download",
     "--ignore": "ignore download anything that is not chosen by user. eg. \"-c --ignore\" will only download cover and skip video file or audio file",
@@ -98,8 +99,8 @@ if __name__ == "__main__":
             continue
 
         try:
-            options, args = getopt.getopt(command.split(" ")[1:], "lcdq:m:p:",
-                                          ["lyric", "cover",  "danmu", "ignore",
+            options, args = getopt.getopt(command.split(" ")[1:], "lcdaq:m:p:",
+                                          ["lyric", "cover",  "danmu", "all","ignore",
                                            "downloader=", "quality=", "maxnumber=","page="
                                            ])
         except:
@@ -118,6 +119,8 @@ if __name__ == "__main__":
             if key == "-d" or key == "--damu":
                 kwargs["damu"] = True
                 method = "video"
+            if key == "-a" or key == "--all":
+                kwargs["all"] = True
             if key == "-p" or key == "--page":
                 kwargs["page"] = int(value)
             if key == "-q" or key == "--quality":

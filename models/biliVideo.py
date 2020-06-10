@@ -11,14 +11,14 @@ class biliVideo():
     patternBv = r"BV[0-9,A-Z,a-z]+"
 
     '''{'quality': 120, 'type': 'FLV', 'desc': '超清 4K'},'''
-    qualities =  [{'quality': 116, 'type': 'FLV', 'desc': '高清 1080P60',"cookie":True},
-                 {'quality': 112, 'type': 'FLV', 'desc': '高清 1080P+',"cookie":True},
-                 {'quality': 80, 'type': 'FLV', 'desc': '高清 1080P',"cookie":True},
-                 {'quality': 74, 'type': 'FLV', 'desc': '高清 720P60',"cookie":True},
-                 {'quality': 64, 'type': 'FLV', 'desc': '高清 720P',"cookie":True},
-                 {'quality': 48, 'type': 'MP4', 'desc': '高清 720P (MP4)',"cookie":True},
-                 {'quality': 32, 'type': 'FLV', 'desc': '清晰 480P',"cookie":False},
-                 {'quality': 16, 'type': 'FLV', 'desc': '流畅 360P',"cookie":False}]
+    qualities = [{'quality': 116, 'type': 'FLV', 'desc': '高清 1080P60', "cookie": True},
+                 {'quality': 112, 'type': 'FLV', 'desc': '高清 1080P+', "cookie": True},
+                 {'quality': 80, 'type': 'FLV', 'desc': '高清 1080P', "cookie": True},
+                 {'quality': 74, 'type': 'FLV', 'desc': '高清 720P60', "cookie": True},
+                 {'quality': 64, 'type': 'FLV', 'desc': '高清 720P', "cookie": True},
+                 {'quality': 48, 'type': 'MP4', 'desc': '高清 720P (MP4)', "cookie": True},
+                 {'quality': 32, 'type': 'FLV', 'desc': '清晰 480P', "cookie": False},
+                 {'quality': 16, 'type': 'FLV', 'desc': '流畅 360P', "cookie": False}]
 
     # videoUrl = "https://www.bilibili.com/video/av%s"
     videoUrl = "https://www.bilibili.com/video/%s"
@@ -57,8 +57,8 @@ class biliVideo():
             v.bid = re.search(cls.patternBv, url).group()
         if re.search(cls.patternAv, url):
             v.bid = videoIdConvertor.av2bv(re.search(cls.patternAv, url).group()[2::])
-        if re.search(r"p=[0-9]+",url):
-            v.currentPage = int(re.search(r"p=[0-9]+",url).group()[2::])
+        if re.search(r"p=[0-9]+", url):
+            v.currentPage = int(re.search(r"p=[0-9]+", url).group()[2::])
         return v
 
     @classmethod
@@ -96,7 +96,7 @@ class biliVideo():
                 break
         return cid
 
-    def getPageName(self,page):
+    def getPageName(self, page):
         pn = ""
         for p in self.pages:
             if p["page"] == page:
@@ -136,11 +136,14 @@ class biliVideo():
                 urls.append(u["backup_url"])
         return {"qn": data["data"]["quality"], "format": data["data"]["format"], "urls": urls}
 
-    def download(self, page=0, qn=116, video=True, damu=False, cover=False, downloader=None, **kwargs):
+    def download(self, page=0, qn=116, video=True, damu=False, cover=False, all=False, downloader=None, **kwargs):
         if page == 0:
             page = self.currentPage
         if not self.isValid(): return
         if downloader == None:
+            return
+        if all:
+            self.downloadAll(qn,video,damu,cover,downloader,**kwargs)
             return
         if video:
             data = self.getPlayurl(page=page, qn=qn)
@@ -148,28 +151,53 @@ class biliVideo():
                 return
             url = data["urls"][0]
             suffix = url.split("?")[0].split(".")[-1]
-            downloader.download(url, Config.saveroute, self.outputTitle("video",page,suffix),
+            downloader.download(url, Config.saveroute, self.outputTitle("video", page, suffix),
                                 headers={"origin": "www.bilibili.com", "referer": self.videoUrl % self.bid,
                                          "user-agent": Config.commonHeaders["user-agent"]})
         if cover:
             suffix = self.cover.split("?")[0].split(".")[-1]
-            downloader.download(self.cover, Config.saveroute, self.outputTitle("cover",page,suffix),
+            downloader.download(self.cover, Config.saveroute, self.outputTitle("cover", page, suffix),
                                 headers={"origin": "www.bilibili.com", "referer": self.videoUrl % self.bid,
                                          "user-agent": Config.commonHeaders["user-agent"]})
         if damu:
             downloaders["requests"]().download(self.dmApi % self.getPageCid(page), Config.saveroute,
-                                               self.outputTitle("damu",page,"xml"))
+                                               self.outputTitle("damu", page, "xml"))
 
-    def outputTitle(self,type,page,suffix):
+
+    def downloadAll(self,qn,video,damu,cover,downloader, **kwargs):
+        if cover:
+            suffix = self.cover.split("?")[0].split(".")[-1]
+            downloader.download(self.cover, Config.saveroute, self.outputTitle("cover", 1, suffix),
+                                headers={"origin": "www.bilibili.com", "referer": self.videoUrl % self.bid,
+                                         "user-agent": Config.commonHeaders["user-agent"]})
+        for page in range(1,len(self.pages)+1):
+            if video:
+                data = self.getPlayurl(page=page, qn=qn)
+                if len(data["urls"]) == 0:
+                    return
+                url = data["urls"][0]
+                suffix = url.split("?")[0].split(".")[-1]
+                downloader.download(url, Config.saveroute, self.outputTitle("video", page, suffix),
+                                    headers={"origin": "www.bilibili.com", "referer": self.videoUrl % self.bid,
+                                             "user-agent": Config.commonHeaders["user-agent"]})
+            if damu:
+                downloaders["requests"]().download(self.dmApi % self.getPageCid(page), Config.saveroute,
+                                                   self.outputTitle("damu", page, "xml"))
+
+    def outputTitle(self, type, page, suffix):
         if (type == "video"):
             if (len(self.pages) > 1):
-                return ".".join(["%s (P%s %s) - %s" %(self.title,page,self.getPageName(page),self.uploader), suffix])
+                return ".".join(
+                    ["%s (P%s %s) - %s" % (self.title, page, self.getPageName(page), self.uploader), suffix])
             else:
                 return ".".join([self.title + " - " + self.uploader, suffix])
         if (type == "cover"):
             return ".".join([self.title, suffix])
         if (type == "damu"):
-            return ".".join([self.title, "xml"])
+            if (len(self.pages) > 1):
+                return ".".join(["%s (P%s %s) - %s" % (self.title, page, self.getPageName(page), self.uploader), "xml"])
+            else:
+                return ".".join([self.title + " - " + self.uploader, "xml"])
 
     def dumpInfo(self):
         qs = ""
@@ -179,26 +207,29 @@ class biliVideo():
                 ("Title", self.title),
                 ("Uploader", self.uploader),
                 ("Available Qualities", qs),
-                ("Total page", str(len(self.pages))+"\n"+"\n".join("P%s - %s" % (x["page"],x["pagename"]) for x in self.pages))
+                ("Total page",
+                 str(len(self.pages)) + "\n" + "\n".join("P%s - %s" % (x["page"], x["pagename"]) for x in self.pages))
                 ]
 
     def isValid(self):
         if self.status == 404: return False
         return True if len(self.pages) > 0 else False
 
+
 class biliBangumi(biliVideo):
     name = "bangumi"
 
-    patterns = [r"https?://(www\.)?bilibili\.com/bangumi/play/ep[0-9]+",r"https?://(www\.)?bilibili\.com/bangumi/play/ss[0-9]+"]
+    patterns = [r"https?://(www\.)?bilibili\.com/bangumi/play/ep[0-9]+",
+                r"https?://(www\.)?bilibili\.com/bangumi/play/ss[0-9]+"]
 
-    def __init__(self,bid):
-        super(biliBangumi,self).__init__(bid)
+    def __init__(self, bid):
+        super(biliBangumi, self).__init__(bid)
 
     @classmethod
     def applicable(cls, url):
         ap = False
         for p in cls.patterns:
-            ap = ap or re.search(p,url) != None
+            ap = ap or re.search(p, url) != None
         return ap
 
     @classmethod
@@ -227,7 +258,8 @@ class biliBangumi(biliVideo):
             if "ep" in url:
                 epid = str(re.search(r"ep[0-9]+", url).group()[2:])
             for index, ep in enumerate(eplist, start=1):
-                pages.append({"page": index, "pagename": "%s %s" % (ep["titleFormat"], ep["longTitle"]), "cid": ep["cid"]})
+                pages.append(
+                    {"page": index, "pagename": "%s %s" % (ep["titleFormat"], ep["longTitle"]), "cid": ep["cid"]})
                 if epid == str(ep["id"]):
                     self.currentPage = index
             self.pages = pages
@@ -235,14 +267,13 @@ class biliBangumi(biliVideo):
             print(repr(e))
             pass
 
-    def outputTitle(self,type,page,suffix):
+    def outputTitle(self, type, page, suffix):
         if (type == "video"):
-            return ".".join(["%s: %s" %(self.title,self.getPageName(page)), suffix])
+            return ".".join(["%s: %s" % (self.title, self.getPageName(page)), suffix])
         if (type == "cover"):
             return ".".join([self.title, suffix])
         if (type == "damu"):
-            return ".".join([self.title, "xml"])
-
+            return ".".join(["%s: %s" % (self.title, self.getPageName(page)), suffix])
 
     def dumpInfo(self):
         qs = ""
@@ -252,8 +283,9 @@ class biliBangumi(biliVideo):
                 ("Title", self.title),
                 ("Current Episode", self.getPageName(self.currentPage)),
                 ("Available Qualities", qs),
-                ("Total page", str(len(self.pages))+"\n"+"\n".join(x["pagename"] for x in self.pages))
+                ("Total page", str(len(self.pages)) + "\n" + "\n".join(x["pagename"] for x in self.pages))
                 ]
+
 
 class biliVideoList():
     name = "videolist"
@@ -333,4 +365,3 @@ class biliVideoList():
                         data={'rid': int(aid), 'type': 2, 'add_media_ids': int(self.media_id), 'del_media_ids': "",
                               'jsonp': 'jsonp'})
         return data.json() if data != None else None
-
