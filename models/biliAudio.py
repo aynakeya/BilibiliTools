@@ -1,4 +1,4 @@
-from utils import httpConnect,filenameparser
+from utils import httpGet,filenameparser
 from config import Config
 import re,random
 
@@ -39,7 +39,7 @@ class biliAudio(object):
         return v
 
     def getInfo(self,**kwargs):
-        data = httpConnect(self.infoApi % self.sid, headers=self.headers)
+        data = httpGet(self.infoApi % self.sid, headers=self.headers)
         if data == None:
             return
         data = data.json()
@@ -53,7 +53,7 @@ class biliAudio(object):
 
     def getQualities(self):
         quality = {}
-        data = httpConnect(self.fileApi % ("2", self.sid), headers=self.headers)
+        data = httpGet(self.fileApi % ("2", self.sid), headers=self.headers)
         if data == None:
             return quality
         data = data.json()
@@ -62,7 +62,7 @@ class biliAudio(object):
         return quality
 
     def getCdns(self, quality=2):
-        data = httpConnect(self.fileApi % (quality, self.sid), headers=self.headers)
+        data = httpGet(self.fileApi % (quality, self.sid), headers=self.headers)
         return [] if data==None else data.json()["data"]["cdns"]
 
     def download(self,downloader=None,qn=2,audio=True,lyric=False,cover=False,**kwargs):
@@ -122,7 +122,7 @@ class biliAudioList(object):
         pn = 1
         api = self.infoApi % (self.sid, "%s")
         while True:
-            data = httpConnect(self.infoApi %(self.sid,pn),headers = Config.commonHeaders)
+            data = httpGet(self.infoApi % (self.sid, pn), headers = Config.commonHeaders)
             if data == None: return
             data = data.json()
             for audio in data["data"]["data"]:

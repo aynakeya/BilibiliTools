@@ -9,17 +9,19 @@ availableDl = {}
 console_method = ["dl", "info", "help", "convert", "quit"]
 console_method_desc = {
     "dl": "start to download。\n    support: video, media list, audio, audio list",
-    "infor": "Print out basic information.",
+    "info": "Print out basic information.",
     "help": "show help",
     "convert": "convert between bv and av",
     "quit": "Quit"
 }
-console_option = ["-l/--lyric", "-q/--quality", "-c/--cover", "-d/--danmu", "-m/--maxnumber", "--ignore",
-                  "--downloader"]
+console_option = ["-l/--lyric",  "-c/--cover", "-d/--danmu", "-m/--maxnumber", "--ignore",
+                  "--downloader","-q/--quality"]
+
 console_option_desc = {
     "-l/--lyric": "download lyric (If have)",
     "-c/--cover": "download cover (If have)",
     "-d/--danmu": "download damu (If have)",
+    "-p/--page" : "download specfic page of the video",
     "-m/--maxnumber": "set the max number of audio or video in a playlist you want to download",
     "--ignore": "ignore download anything that is not chosen by user. eg. \"-c --ignore\" will only download cover and skip video file or audio file",
     "--downloader": "use specific downloader.\n" +
@@ -28,16 +30,13 @@ console_option_desc = {
     "-q/--quality": "choose the quality.\n" +
                     "Available Audio Quality:\n" +
                     "· 2 - 320k 高品质\n· 1 - 196k 标准\n· 0 - 128k 流畅\n" +
-                    "Available Video Video Quality:\n" +
-                    "· 116 - 高清 1080P60(SESSDATA required)\n· 112 - 高清 1080P+(SESSDATA required)\n" +
-                    "· 80 - 高清 1080P(SESSDATA required)\n· 74 - 高清 720P60(SESSDATA required)\n" +
-                    "· 64 - 高清 720P(SESSDATA required)\n· 48 - 高清 720P (MP4)(SESSDATA required)\n" +
-                    "· 32 - 清晰 480P\n· 16 - 流畅 360P"
+                    "Available Video Quality:\n" +
+                    "\n".join(["· %s - %s %s" % (x["quality"],x["desc"],"(SESSDATA Required)" if x["cookie"] else "") for x in amdls["video"].qualities])
 }
 
 
 def initDownloaders():
-    for dl in Config.useDownloader:
+    for dl in Config.useDownloader.keys():
         if adls.get(dl) is not None:
             availableDl[adls.get(dl).name] = adls.get(dl)()
 
@@ -50,6 +49,10 @@ def autoSelector(url):
 
 
 if __name__ == "__main__":
+    # from models.biliVideo import biliBangumi
+    # print(biliBangumi.applicable("https://www.bilibili.com/bangumi/play/ep266326"))
+    # sys.exit()
+
     initDownloaders()
     while True:
         command = input("Download: ")
@@ -95,9 +98,10 @@ if __name__ == "__main__":
             continue
 
         try:
-            options, args = getopt.getopt(command.split(" ")[1:], "lcdq:m:",
-                                          ["lyric", "cover", "quality=", "danmu", "downloader=", "maxnumber=",
-                                           "ignore"])
+            options, args = getopt.getopt(command.split(" ")[1:], "lcdq:m:p:",
+                                          ["lyric", "cover",  "danmu", "ignore",
+                                           "downloader=", "quality=", "maxnumber=","page="
+                                           ])
         except:
             print("illegal option")
             continue
@@ -114,6 +118,8 @@ if __name__ == "__main__":
             if key == "-d" or key == "--damu":
                 kwargs["damu"] = True
                 method = "video"
+            if key == "-p" or key == "--page":
+                kwargs["page"] = int(value)
             if key == "-q" or key == "--quality":
                 kwargs["qn"] = value
             if key == "-m" or key == "--maxnumber":

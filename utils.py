@@ -4,7 +4,7 @@ def filenameparser(filename):
     pattern = r'[\\/:*?"<>|\r\n]+'
     return re.sub(pattern,"-",filename)
 
-def httpConnect(url, maxReconn=5, **kwargs):
+def httpGet(url, maxReconn=5, **kwargs):
     trial = 0
     while trial < maxReconn:
         try:

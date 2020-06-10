@@ -14,8 +14,10 @@ class Config:
 
     defaultDownloader = "aria2"
 
-    useDownloader = ["aria2","requests"]
+    # Available: aria2, requests
+    useDownloader = {"aria2":True,
+                     "requests":True}
 
-    useModules  = ["infoEditor"]
+    #useModules  = ["infoEditor"]
 
     defaultQuality = 116

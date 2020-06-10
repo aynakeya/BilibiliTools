@@ -1,5 +1,5 @@
 from config import Config
-from utils import filenameparser,httpConnect
+from utils import filenameparser,httpGet
 import os
 
 class requestsDownloader():
@@ -10,7 +10,7 @@ class requestsDownloader():
 
     def download(self, url, route, filename,**kwargs):
         fn = filenameparser(filename)
-        raw_data = httpConnect(url,**kwargs)
+        raw_data = httpGet(url, **kwargs)
         if raw_data == None:
             return False
         path = os.path.join(route, fn)
