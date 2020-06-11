@@ -1,4 +1,5 @@
-import re,requests
+from config import Config
+import re,requests,time,os,qrcode
 
 def filenameparser(filename):
     pattern = r'[\\/:*?"<>|\r\n]+'
@@ -57,3 +58,83 @@ class videoIdConvertor():
         if re.search(cls.patternAv, url):
             return cls.videoUrl % cls.av2bv(int(re.search(cls.patternAv, url).group()[2::]))
         return ""
+
+class QrLogin():
+    infoApi = "https://account.bilibili.com/home/userInfo"
+    qrApi = "https://passport.bilibili.com/qrcode/getLoginUrl"
+    checkQrApi = "https://passport.bilibili.com/qrcode/getLoginInfo"
+
+    def __init__(self,invert,console):
+        self.invert = invert
+        self.console = console
+        self.oauthKey = ""
+        self.urldata = ""
+
+    @staticmethod
+    def manuallylogin():
+        ql = QrLogin.newlogin()
+        print("getting qrcode")
+        ql.getQrcode()
+        print("Please scan qrcode using your application")
+        if ql.getResult():
+            print("login success, you Sessdata is %s" % ql.getSessdata())
+            Config.commonCookies["SESSDATA"] = ql.getSessdata()
+            if input("write to the config? y/n ") == "y":
+                ql.writeToConfig()
+        else:
+            print("fail, please try again")
+
+    @classmethod
+    def newlogin(cls):
+        a= input("invert color? y/n ") == "y"
+        b = input("Console output? y/n ") == "y"
+        return cls(a,b)
+
+    @classmethod
+    def isLogin(cls):
+        return Config.commonCookies != ""
+        # resp = httpGet(cls.infoApi,cookies=Config.commonCookies)
+        # try:
+        #     print(resp.json())
+        #     return resp.json()["code"] == 0
+        # except:
+        #     return False
+
+    def getQrcode(self):
+        data = httpGet(self.qrApi).json()
+
+        qrurl = data["data"]["url"]
+        self.oauthKey = data["data"]["oauthKey"]
+        qc = qrcode.QRCode()
+        qc.add_data(qrurl)
+        if self.console:
+            qc.print_ascii(invert=self.invert)
+        else:
+            qc.make_image().save("./qrcode.png")
+            os.system("qrcode.png")
+
+    def getResult(self,interval=1):
+        data = httpPost(self.checkQrApi,data={'oauthKey':self.oauthKey,'gourl': 'https://passport.bilibili.com/account/security'})
+        if data == None:
+            return False
+        while not data.json()["status"]:
+            data = httpPost(self.checkQrApi,
+                            data={'oauthKey': self.oauthKey, 'gourl': 'https://passport.bilibili.com/account/security'})
+            if data.json()['data'] == -2:
+                print('二维码已过期')
+                return False
+            time.sleep(interval)
+        self.urldata = data.json()["data"]["url"]
+        return True
+    def getSessdata(self):
+        pattern = r"SESSDATA=(.*?)&"
+        return "" if re.search(pattern,self.urldata) == None else re.search(pattern,self.urldata).group()[9:-1:]
+    def writeToConfig(self):
+        pattern = r"\"SESSDATA\":\"(.*?)\""
+        with open("config.py","r+",encoding="utf8") as f:
+            text = f.read()
+            f.seek(0)
+            f.write(re.sub(pattern,"\"SESSDATA\":\"%s\"" % self.getSessdata(),text,1))
+
+    def isValid(self):
+        return self.oauthKey != ""

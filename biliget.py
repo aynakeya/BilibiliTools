@@ -1,17 +1,18 @@
 from config import Config
 from downloaders import downloaders as adls
 from models import models as amdls
-from utils import videoIdConvertor
+from utils import videoIdConvertor,QrLogin
 import re, sys, getopt
 
 availableDl = {}
 
-console_method = ["dl", "info", "help", "convert", "quit"]
+console_method = ["dl", "info", "help", "convert","qrlogin", "quit"]
 console_method_desc = {
     "dl": "start to download。\n    support: video, media list, audio, audio list",
     "info": "Print out basic information.",
     "help": "show help",
     "convert": "convert between bv and av",
+    "qrlogin":"get cookie using qrcode login",
     "quit": "Quit"
 }
 console_option = ["-l/--lyric",  "-c/--cover", "-d/--danmu", "-m/--maxnumber", "--ignore",
@@ -54,6 +55,10 @@ if __name__ == "__main__":
     # print(biliBangumi.applicable("https://www.bilibili.com/bangumi/play/ep266326"))
     # sys.exit()
 
+    if Config.commonCookies["SESSDATA"] == "":
+        if input("We found that there is no sessdata included, would you like to login using qrcode y/n ?") == "y":
+            QrLogin.manuallylogin()
+
     initDownloaders()
     while True:
         command = input("Download: ")
@@ -79,6 +84,11 @@ if __name__ == "__main__":
                     continue
                 print("%s -> %s" % (url, urla))
             continue
+
+        if method == "qrlogin":
+            QrLogin.manuallylogin()
+            continue
+
 
         if method == "info":
             for url in [s for s in command.split(" ")[1:] if s != ""]:
