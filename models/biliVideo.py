@@ -219,8 +219,10 @@ class biliVideo():
 class biliBangumi(biliVideo):
     name = "bangumi"
 
-    patterns = [r"https?://(www\.)?bilibili\.com/bangumi/play/ep[0-9]+",
-                r"https?://(www\.)?bilibili\.com/bangumi/play/ss[0-9]+"]
+    patterns = [r"ep[0-9]+",
+                r"ss[0-9]+"]
+
+    bangumiUrl = "https://www.bilibili.com/bangumi/play/%s"
 
     def __init__(self, bid):
         super(biliBangumi, self).__init__(bid)
@@ -235,13 +237,15 @@ class biliBangumi(biliVideo):
     @classmethod
     def initFromUrl(cls, url):
         if cls.applicable(url):
-            return biliBangumi(url)
+            for p in cls.patterns:
+                if re.search(p,url) != None:
+                    return biliBangumi(re.search(p,url).group())
         return biliBangumi("")
 
     def getInfo(self, **kwargs):
         if self.bid == "":
             return
-        url = self.bid
+        url = self.bangumiUrl % self.bid
         rawhtml = httpGet(url)
         if rawhtml == None:
             return
