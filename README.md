@@ -75,6 +75,19 @@ class Config:
 *被pilipili退回了。*
 
 ---
+### JSCripts
+
+**js脚本**
+
+用于全平台浏览器的收藏夹脚本
+
+具体使用方式就是加入收藏夹，然后把地址改为js代码
+
+videoDownload - 视频下载
+
+videoCover - 封面下载
+
+---
 ### biliFavExtractor.py
 
 **收藏夹信息导出**
