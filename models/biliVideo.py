@@ -11,7 +11,8 @@ class biliVideo():
     patternBv = r"BV[0-9,A-Z,a-z]+"
 
     '''{'quality': 120, 'type': 'FLV', 'desc': '超清 4K'},'''
-    qualities = [{'quality': 116, 'type': 'FLV', 'desc': '高清 1080P60', "cookie": True},
+    qualities = [{'quality': 120, 'type': 'FLV', 'desc': '超清 4K',"cookie": True},
+                 {'quality': 116, 'type': 'FLV', 'desc': '高清 1080P60', "cookie": True},
                  {'quality': 112, 'type': 'FLV', 'desc': '高清 1080P+', "cookie": True},
                  {'quality': 80, 'type': 'FLV', 'desc': '高清 1080P', "cookie": True},
                  {'quality': 74, 'type': 'FLV', 'desc': '高清 720P60', "cookie": True},
@@ -25,7 +26,7 @@ class biliVideo():
     # pagesApi = "https://www.bilibili.com/widget/getPageList?aid=%s"
     pagesApi = "https://api.bilibili.com/x/player/pagelist?bvid=%s"
     detailApi = "https://api.bilibili.com/x/web-interface/view/detail?bvid=%s&aid=&jsonp=jsonp"
-    playurlApi = "https://api.bilibili.com/x/player/playurl?avid=&bvid=%s&cid=%s&qn=%s&type=&otype=json"
+    playurlApi = "https://api.bilibili.com/x/player/playurl?avid=&bvid=%s&cid=%s&qn=%s&type=&otype=json&fourk=1"
     dmApi = "https://api.bilibili.com/x/v1/dm/list.so?oid=%s"
 
     def __init__(self, bid):

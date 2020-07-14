@@ -1,5 +1,5 @@
 javascript: (function() {
-	var qn = prompt("视频下载,选择清晰度:116,112,80,74,64,48,32,16", 116);
+	var qn = prompt("视频下载,选择清晰度:120,116,112,80,74,64,48,32,16", 116);
 	var bv = "";
 	var cid = "";
 	// normal video
@@ -18,7 +18,7 @@ javascript: (function() {
 			withCredentials: true
 		}
 	});
-	$.get("https://api.bilibili.com/x/player/playurl?bvid=" + bv + "&cid=" + cid + "&qn=" + qn + "&type=&otype=json",
+	$.get("https://api.bilibili.com/x/player/playurl?bvid=" + bv + "&cid=" + cid + "&qn=" + qn + "&type=&otype=json&fourk=1",
 	function(data, status) {
 		var dlink = document.createElementNS("http://www.w3.org/1999/xhtml", "a");
 		dlink.href = data.data.durl[0]["url"].replace("http", "https");

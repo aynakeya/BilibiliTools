@@ -20,4 +20,4 @@ class Config:
 
     #useModules  = ["infoEditor"]
 
-    defaultQuality = 116
+    defaultQuality = 120
