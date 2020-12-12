@@ -201,7 +201,7 @@ class biliVideo():
                 return ".".join([self.title + " - " + self.uploader, "xml"])
 
     def dumpInfo(self):
-        qs = ""
+        qs = "\n"
         for key, value in self.getQualities().items():
             qs += "%s: %s(%s)\n" % (key, value[1], value[0])
         return [("Type", self.name),
@@ -281,7 +281,7 @@ class biliBangumi(biliVideo):
             return ".".join(["%s: %s" % (self.title, self.getPageName(page)), suffix])
 
     def dumpInfo(self):
-        qs = ""
+        qs = "\n"
         for key, value in self.getQualities().items():
             qs += "%s : %s(%s)\n" % (key, value[1], value[0])
         return [("Type", self.name),

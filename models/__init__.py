@@ -6,3 +6,9 @@ models = {biliAudio.name:biliAudio,
           biliVideo.name:biliVideo,
           biliVideoList.name:biliVideoList,
           biliBangumi.name:biliBangumi}
+
+def modelSelector(url):
+    for m in models.values():
+        if m.applicable(url):
+            return m
+    return None

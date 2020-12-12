@@ -1,7 +1,10 @@
+from typing import Dict, Any
+
 from config import Config
 from downloaders import downloaders as adls
 from models import models as amdls
-from utils import videoIdConvertor,QrLogin
+from modules import modules as modulelist
+from modules import BaseModule
 import re, sys, getopt
 
 availableDl = {}
@@ -48,114 +51,142 @@ def autoSelector(url):
         if m.applicable(url):
             return m
     return None
+def info(msg):
+    print("BilibiliTools > %s" %(msg))
+modules: Dict[str, BaseModule] = dict((m.__name__,m()) for m in modulelist)
+methods: Dict[str, BaseModule] = {"help":None,
+                                  "quit":None}
+methods.update(dict((key,m)for m in modules.values() for key in m.getMethod().keys()))
+
 
 
 if __name__ == "__main__":
-    # from models.biliVideo import biliBangumi
-    # print(biliBangumi.applicable("https://www.bilibili.com/bangumi/play/ep266326"))
-    # sys.exit()
-
-    if Config.commonCookies["SESSDATA"] == "":
-        if input("We found that there is no sessdata included, would you like to login using qrcode y/n ?") == "y":
-            QrLogin.manuallylogin()
-
-    initDownloaders()
+    for module in modules.values():
+        module.prepare()
     while True:
-        command = input("Download: ")
+        command = input("-> ")
         method = command.split(" ")[0]
-        if not method in console_method:
-            print("Invalid method.")
+        if not method in methods.keys():
+            info("Invalid method.")
             continue
         if method == "quit":
-            print("Stop console")
+            info("Stop console")
             sys.exit()
         if method == "help":
-            print("\nMethods:")
-            for i in console_method:
-                print(i, ":", console_method_desc[i])
-            print("\nOptions")
-            for i in console_option:
-                print(i, ":", console_option_desc[i])
+            info("Methods: ")
+            for key,module in modules.items():
+                for m,desc in module.getMethod().items():
+                    info("      %s: %s" %(m, desc))
+            info("Options:")
+            for key,module in modules.items():
+                for m, desc in module.getOptions().items():
+                    info("      %s: %s" % (m, desc))
+            info("---")
             continue
-        if method == "convert":
-            for url in [s for s in command.split(" ")[1:] if s != ""]:
-                urla = videoIdConvertor.urlConvert(url)
-                if urla == "":
-                    continue
-                print("%s -> %s" % (url, urla))
-            continue
-
-        if method == "qrlogin":
-            QrLogin.manuallylogin()
-            continue
-
-
-        if method == "info":
-            for url in [s for s in command.split(" ")[1:] if s != ""]:
-                print("Start to get information of %s" % url)
-                m = autoSelector(url).initFromUrl(url) if autoSelector(url) != None else None
-                if m == None:
-                    print("Url not support")
-                    continue
-                m.getInfo()
-                if m.isValid():
-                    print("--")
-                    for key, value in m.dumpInfo():
-                        print("%s:" % key)
-                        print("%s" % value)
-                    print("--")
-                else:
-                    print("this url may not be available now")
-            continue
-
-        try:
-            options, args = getopt.getopt(command.split(" ")[1:], "lcdaq:m:p:",
-                                          ["lyric", "cover",  "danmu", "all","ignore",
-                                           "downloader=", "quality=", "maxnumber=","page="
-                                           ])
-        except:
-            print("illegal option")
-            continue
-
-        kwargs = {}
-        # todo default config
-        kwargs["qn"] = Config.defaultQuality
-        kwargs["downloader"] = availableDl.get(Config.defaultDownloader)
-        for key, value in options:
-            if key == "-l" or key == "--lyric":
-                kwargs["lyric"] = True
-            if key == "-c" or key == "--cover":
-                kwargs["cover"] = True
-            if key == "-d" or key == "--damu":
-                kwargs["damu"] = True
-                method = "video"
-            if key == "-a" or key == "--all":
-                kwargs["all"] = True
-            if key == "-p" or key == "--page":
-                kwargs["page"] = int(value)
-            if key == "-q" or key == "--quality":
-                kwargs["qn"] = value
-            if key == "-m" or key == "--maxnumber":
-                kwargs["maxNum"] = int(value)
-            if key == "--downloader":
-                kwargs["downloader"] = availableDl.get(value)
-            if key == "--ignore":
-                kwargs["audio"] = False
-                kwargs["video"] = False
-
-        if kwargs["downloader"] == None:
-            print("Downloader didn't found")
-            continue
-
-        for url in [s for s in args if s != ""]:
-            print("Start to download %s" % url)
-            m = autoSelector(url).initFromUrl(url) if autoSelector(url) != None else None
-            if m == None:
-                print("Url not support")
-                continue
-            m.getInfo(**kwargs)
-            if m.isValid():
-                m.download(**kwargs)
-                print("Download finish")
-            else:
-                print("this url may not be available now")
+        methods[method].process(command)
+    # if Config.commonCookies["SESSDATA"] == "":
+    #     if input("We found that there is no sessdata included, would you like to login using qrcode y/n ?") == "y":
+    #         QrLogin.manuallylogin()
+    #
+    # initDownloaders()
+    # while True:
+    #     command = input("Download: ")
+    #     method = command.split(" ")[0]
+    #     if not method in console_method:
+    #         print("Invalid method.")
+    #         continue
+    #     if method == "quit":
+    #         print("Stop console")
+    #         sys.exit()
+    #     if method == "help":
+    #         print("\nMethods:")
+    #         for i in console_method:
+    #             print(i, ":", console_method_desc[i])
+    #         print("\nOptions")
+    #         for i in console_option:
+    #             print(i, ":", console_option_desc[i])
+    #         continue
+    #
+    #
+    #     if method == "convert":
+    #         for url in [s for s in command.split(" ")[1:] if s != ""]:
+    #             urla = videoIdConvertor.urlConvert(url)
+    #             if urla == "":
+    #                 continue
+    #             print("%s -> %s" % (url, urla))
+    #         continue
+    #
+    #     if method == "qrlogin":
+    #         QrLogin.manuallylogin()
+    #         continue
+    #
+    #
+    #     if method == "info":
+    #         for url in [s for s in command.split(" ")[1:] if s != ""]:
+    #             print("Start to get information of %s" % url)
+    #             m = autoSelector(url).initFromUrl(url) if autoSelector(url) != None else None
+    #             if m == None:
+    #                 print("Url not support")
+    #                 continue
+    #             m.getInfo()
+    #             if m.isValid():
+    #                 print("--")
+    #                 for key, value in m.dumpInfo():
+    #                     print("%s:" % key)
+    #                     print("%s" % value)
+    #                 print("--")
+    #             else:
+    #                 print("this url may not be available now")
+    #         continue
+    #
+    #     try:
+    #         options, args = getopt.getopt(command.split(" ")[1:], "lcdaq:m:p:",
+    #                                       ["lyric", "cover",  "danmu", "all","ignore",
+    #                                        "downloader=", "quality=", "maxnumber=","page="
+    #                                        ])
+    #     except:
+    #         print("illegal option")
+    #         continue
+    #
+    #     kwargs = {}
+    #     # todo default config
+    #     kwargs["qn"] = Config.defaultQuality
+    #     kwargs["downloader"] = availableDl.get(Config.defaultDownloader)
+    #     for key, value in options:
+    #         if key == "-l" or key == "--lyric":
+    #             kwargs["lyric"] = True
+    #         if key == "-c" or key == "--cover":
+    #             kwargs["cover"] = True
+    #         if key == "-d" or key == "--damu":
+    #             kwargs["damu"] = True
+    #             method = "video"
+    #         if key == "-a" or key == "--all":
+    #             kwargs["all"] = True
+    #         if key == "-p" or key == "--page":
+    #             kwargs["page"] = int(value)
+    #         if key == "-q" or key == "--quality":
+    #             kwargs["qn"] = value
+    #         if key == "-m" or key == "--maxnumber":
+    #             kwargs["maxNum"] = int(value)
+    #         if key == "--downloader":
+    #             kwargs["downloader"] = availableDl.get(value)
+    #         if key == "--ignore":
+    #             kwargs["audio"] = False
+    #             kwargs["video"] = False
+    #
+    #     if kwargs["downloader"] == None:
+    #         print("Downloader didn't found")
+    #         continue
+    #
+    #     for url in [s for s in args if s != ""]:
+    #         print("Start to download %s" % url)
+    #         m = autoSelector(url).initFromUrl(url) if autoSelector(url) != None else None
+    #         if m == None:
+    #             print("Url not support")
+    #             continue
+    #         m.getInfo(**kwargs)
+    #         if m.isValid():
+    #             m.download(**kwargs)
+    #             print("Download finish")
+    #         else:
+    #             print("this url may not be available now")
