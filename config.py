@@ -18,6 +18,6 @@ class Config:
     useDownloader = {"aria2":True,
                      "requests":True}
 
-    useModules  = ["Login","VideoIdConverter","Info","Download"]
+    useModules  = ["Login","VideoIdConverter","Info","Download","MPV"]
 
     defaultQuality = 120

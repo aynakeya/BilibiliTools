@@ -125,12 +125,14 @@ class biliVideo():
             page = self.currentPage
         cid = self.getPageCid(page)
         if cid == 0:
-            return {}
+            return None
         data = httpGet(self.playurlApi % (self.bid, cid, qn), headers=Config.commonHeaders,
                        cookies=Config.commonCookies)
         if data == None:
-            return {}
+            return None
         data = data.json()
+        if (data["code"] != 0):
+            return None
         for u in data["data"]["durl"]:
             urls.append(u["url"])
             if u["backup_url"] != None:
@@ -224,6 +226,7 @@ class biliBangumi(biliVideo):
                 r"ss[0-9]+"]
 
     bangumiUrl = "https://www.bilibili.com/bangumi/play/%s"
+    playurlApi = "https://api.bilibili.com/pgc/player/web/playurl?avid=&bvid=%s&cid=%s&qn=%s&type=&otype=json&fourk=1"
 
     def __init__(self, bid):
         super(biliBangumi, self).__init__(bid)
@@ -242,6 +245,40 @@ class biliBangumi(biliVideo):
                 if re.search(p,url) != None:
                     return biliBangumi(re.search(p,url).group())
         return biliBangumi("")
+
+    def getQualities(self, page=1):
+        quality = {}
+        cid = self.getPageCid(page)
+        if cid == 0:
+            return quality
+        data = httpGet(self.playurlApi % (self.bid, cid, 32))
+        if data == None:
+            return quality
+        data = data.json()
+        formats = data["result"]["accept_format"].split(",")
+        for index, qn in enumerate(data["result"]["accept_quality"]):
+            quality[qn] = (formats[index], data["result"]["accept_description"][index])
+        return quality
+
+    def getPlayurl(self, page=0, qn=116):
+        urls = []
+        if page == 0:
+            page = self.currentPage
+        cid = self.getPageCid(page)
+        if cid == 0:
+            return None
+        data = httpGet(self.playurlApi % (self.bid, cid, qn), headers=Config.commonHeaders,
+                       cookies=Config.commonCookies)
+        if data == None:
+            return None
+        data = data.json()
+        if (data["code"] != 0):
+            return None
+        for u in data["result"]["durl"]:
+            urls.append(u["url"])
+            if u["backup_url"] != None:
+                urls.append(u["backup_url"])
+        return {"qn": data["result"]["quality"], "format": data["result"]["format"], "urls": urls}
 
     def getInfo(self, **kwargs):
         if self.bid == "":
