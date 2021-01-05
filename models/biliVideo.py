@@ -10,6 +10,9 @@ class biliVideo():
     patternAv = r"av[0-9]+"
     patternBv = r"BV[0-9,A-Z,a-z]+"
 
+    downloadable = True
+    watchable = True
+
     '''{'quality': 120, 'type': 'FLV', 'desc': '超清 4K'},'''
     qualities = [{'quality': 120, 'type': 'FLV', 'desc': '超清 4K',"cookie": True},
                  {'quality': 116, 'type': 'FLV', 'desc': '高清 1080P60', "cookie": True},
@@ -22,7 +25,7 @@ class biliVideo():
                  {'quality': 16, 'type': 'FLV', 'desc': '流畅 360P', "cookie": False}]
 
     # videoUrl = "https://www.bilibili.com/video/av%s"
-    videoUrl = "https://www.bilibili.com/video/%s"
+    baseUrl = "https://www.bilibili.com/video/%s"
     # pagesApi = "https://www.bilibili.com/widget/getPageList?aid=%s"
     pagesApi = "https://api.bilibili.com/x/player/pagelist?bvid=%s"
     detailApi = "https://api.bilibili.com/x/web-interface/view/detail?bvid=%s&aid=&jsonp=jsonp"
@@ -37,6 +40,10 @@ class biliVideo():
         self.cover = ""
         self.currentPage = 1
         self.status = 200
+
+    @property
+    def id(self):
+        return self.bid
 
     @classmethod
     def applicable(cls, url):
@@ -155,12 +162,12 @@ class biliVideo():
             url = data["urls"][0]
             suffix = url.split("?")[0].split(".")[-1]
             downloader.download(url, Config.saveroute, self.outputTitle("video", page, suffix),
-                                headers={"origin": "www.bilibili.com", "referer": self.videoUrl % self.bid,
+                                headers={"origin": "www.bilibili.com", "referer": self.baseUrl % self.bid,
                                          "user-agent": Config.commonHeaders["user-agent"]})
         if cover:
             suffix = self.cover.split("?")[0].split(".")[-1]
             downloader.download(self.cover, Config.saveroute, self.outputTitle("cover", page, suffix),
-                                headers={"origin": "www.bilibili.com", "referer": self.videoUrl % self.bid,
+                                headers={"origin": "www.bilibili.com", "referer": self.baseUrl % self.bid,
                                          "user-agent": Config.commonHeaders["user-agent"]})
         if damu:
             downloaders["requests"]().download(self.dmApi % self.getPageCid(page), Config.saveroute,
@@ -171,7 +178,7 @@ class biliVideo():
         if cover:
             suffix = self.cover.split("?")[0].split(".")[-1]
             downloader.download(self.cover, Config.saveroute, self.outputTitle("cover", 1, suffix),
-                                headers={"origin": "www.bilibili.com", "referer": self.videoUrl % self.bid,
+                                headers={"origin": "www.bilibili.com", "referer": self.baseUrl % self.bid,
                                          "user-agent": Config.commonHeaders["user-agent"]})
         for page in range(1,len(self.pages)+1):
             if video:
@@ -181,7 +188,7 @@ class biliVideo():
                 url = data["urls"][0]
                 suffix = url.split("?")[0].split(".")[-1]
                 downloader.download(url, Config.saveroute, self.outputTitle("video", page, suffix),
-                                    headers={"origin": "www.bilibili.com", "referer": self.videoUrl % self.bid,
+                                    headers={"origin": "www.bilibili.com", "referer": self.baseUrl % self.bid,
                                              "user-agent": Config.commonHeaders["user-agent"]})
             if damu:
                 downloaders["requests"]().download(self.dmApi % self.getPageCid(page), Config.saveroute,
@@ -339,9 +346,16 @@ class biliVideoList():
     # addApi = "https://api.bilibili.com/medialist/gateway/coll/resource/deal"
     addApi = "https://api.bilibili.com/x/v3/fav/resource/deal"
 
+    downloadable = True
+    watchable = False
+
     def __init__(self, media_id):
         self.media_id = media_id
         self.videos = []
+
+    @property
+    def id(self):
+        return self.media_id
 
     @classmethod
     def applicable(cls, url):

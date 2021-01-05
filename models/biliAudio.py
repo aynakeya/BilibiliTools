@@ -13,12 +13,19 @@ class biliAudio(object):
                'Accept': "*/*",
                'Connection': "keep-alive"}
 
+    downloadable = True
+    watchable = False
+
     def __init__(self, sid):
         self.sid = sid
         self.title = ""
         self.uploader = ""
         self.lyric = ""
         self.cover = ""
+
+    @property
+    def id(self):
+        return self.sid
 
     @classmethod
     def applicable(cls,url):
@@ -103,9 +110,16 @@ class biliAudioList(object):
     pattern = r"am[0-9]+"
     infoApi = "https://www.bilibili.com/audio/music-service-c/web/song/of-menu?ps=100&sid=%s&pn=%s"
 
+    downloadable = True
+    watchable = False
+
     def __init__(self, sid):
         self.sid = sid
         self.audio = []
+
+    @property
+    def id(self):
+        return self.sid
 
     @classmethod
     def applicable(cls, url):

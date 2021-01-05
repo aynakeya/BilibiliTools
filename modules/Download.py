@@ -86,6 +86,9 @@ class Download(BaseModule):
             if m == None:
                 self.info("%s not support" %url)
                 continue
+            if not m.downloadable:
+                self.info("%s not support" % url)
+                continue
             m.getInfo(**kwargs)
             if m.isValid():
                 m.download(**kwargs)

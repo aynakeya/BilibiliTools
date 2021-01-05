@@ -1,5 +1,6 @@
 certifi==2019.9.11
 chardet==3.0.4
+colorama==0.4.4
 idna==2.8
 mutagen==1.43.0
 Pillow==7.1.2
@@ -7,4 +8,5 @@ pyaria2==0.1.1
 pyparsing==2.4.7
 qrcode==6.1
 requests==2.22.0
+six==1.15.0
 urllib3==1.25.7

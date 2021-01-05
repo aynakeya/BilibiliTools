@@ -17,8 +17,11 @@ class MPV(BaseModule):
         if (playurl == None):
             self.info("无法获取到视频源地址，可能是没开带会员")
             return
-        title = model.outputTitle("video",model.currentPage,"")[:-1:]
-        headers={"origin": "www.bilibili.com", "referer": model.videoUrl % model.bid,
+        if model.title:
+            title= model.title
+        else:
+            title = model.outputTitle("video",model.currentPage,"")[:-1:]
+        headers={"origin": "www.bilibili.com", "referer": model.baseUrl % model.id,
                                          "user-agent": Config.commonHeaders["user-agent"]}
         subprocess.Popen("mpv --force-media-title=\"%s\" %s \"%s\"" %(title,self.mpvHeaderString(headers),playurl["urls"][0]))
 
@@ -33,7 +36,7 @@ class MPV(BaseModule):
         if m == None:
             self.info("%s not support" % url)
             return
-        if m.name != "video" and m.name !="bangumi":
+        if not m.watchable:
             self.info("%s not support" % url)
             return
         m.getInfo()
