@@ -1,5 +1,5 @@
 from sources.base import MediaSource
-from utils.http import httpGet
+from utils.vhttp import httpGet
 from config import Config
 from sources.bilibili import BilibiliSource
 import re

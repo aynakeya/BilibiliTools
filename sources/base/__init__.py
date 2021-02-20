@@ -35,6 +35,9 @@ class BaseSource(CommonSource):
         self.headers = {}
         self.filename = ""
 
+    @property
+    def suffix(self):
+        return self.filename.split(".")[-1]
     def getSource(self):
         return "base.%s" % self.name
 

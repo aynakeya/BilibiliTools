@@ -70,9 +70,11 @@ class UniversalDownload(BaseModule):
                 s: BaseSource
                 if isinstance(val,list):
                     for s in val:
+                        self.info("Downloading {}".format(s.filename))
                         s.download(downloader,Config.saveroute)
                 else:
                     s = val
+                    self.info("Downloading {}".format(s.filename))
                     s.download(downloader,Config.saveroute)
 
 exports = [UniversalDownload]

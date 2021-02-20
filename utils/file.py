@@ -16,8 +16,14 @@ def writeToFile(content,route,name,binary=False):
         with open(path, "wb+") as f:
             f.write(content)
     else:
-        with open(path, "w+") as f:
+        with open(path, "w+",encoding="utf-8") as f:
             f.write(content)
 
+def removeUrlPara(url):
+    return url.split("?")[0]
+
 def getSuffixByUrl(url):
-    return url.split(".")[-1]
+    return removeUrlPara(url).split(".")[-1]
+
+def getFileNameByUrl(url):
+    return removeUrlPara(url).split("/")[-1]

@@ -6,7 +6,7 @@ from sources import TextSource
 from sources.wenku8 import Wenku8Source
 import re
 
-from utils.http import httpGet
+from utils.vhttp import httpGet
 
 
 class Wenku8TXT(Wenku8Source):

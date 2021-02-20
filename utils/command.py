@@ -3,6 +3,7 @@ class OptionParser():
         raw:str
         self.raw = raw
         self.remove_first = not first
+        self.command = ""
         self.options = {}
         self.args = []
         self._process()
@@ -10,6 +11,7 @@ class OptionParser():
 
     def _process(self):
         rawlist = [x for x in self.raw.split(" ") if x != ""]
+        self.command = rawlist[0]
         if self.remove_first:
             rawlist = rawlist[1::]
         for seg in rawlist:

@@ -4,7 +4,7 @@ from sources.video import VideoSource
 from utils import file
 import re,json
 
-from utils.http import httpGet
+from utils.vhttp import httpGet
 
 
 class ImomoeSource(VideoSource):

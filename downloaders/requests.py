@@ -1,6 +1,6 @@
 from config import Config
 from downloaders import BaseDownloader
-from utils import http,file
+from utils import vhttp,file
 import os
 
 class requestsDownloader(BaseDownloader):
@@ -11,7 +11,7 @@ class requestsDownloader(BaseDownloader):
 
     def download(self, url, route, filename,**kwargs):
         fn = file.parseFilename(filename)
-        raw_data = http.httpGet(url, **kwargs)
+        raw_data = vhttp.httpGet(url, **kwargs)
         if raw_data == None:
             return False
         path = os.path.join(route, fn)

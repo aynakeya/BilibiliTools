@@ -4,7 +4,7 @@ from sources.video import VideoSource
 from utils import file
 import re,json
 
-from utils.http import httpGet
+from utils.vhttp import httpGet
 
 
 class KakadmSource(VideoSource):
@@ -62,7 +62,8 @@ class KakadmSource(VideoSource):
 
     def getVideo(self):
         try:
-            player_html = httpGet(self.real_src_api.format(src=self.src)).content.decode("utf-8")
+            player_html = httpGet(self.real_src_api.format(src=self.src),
+                                  cookies=Config.getCookie("kakadm")).content.decode("utf-8")
             real_url = re.search(
                 r"url:\"(.*)\"",player_html.replace(" ","")).group()[5:-1:]
             return MediaSource(real_url,Config.commonHeaders,
@@ -73,10 +74,12 @@ class KakadmSource(VideoSource):
 
     def load(self,**kwargs):
         try:
-            raw_html = httpGet(self.player_url.format(aid=self.aid,pid=self.pid))
+            raw_html = httpGet(self.player_url.format(aid=self.aid,pid=self.pid),
+                               cookies=Config.getCookie("kakadm"))
             html_text= raw_html.content.decode("utf-8")
             self.title = re.search(r"play_title=\"(.*)\";",html_text).group()[12:-2:]
-            data_html = httpGet(self.src_api.format(aid=self.aid,pid=self.pid)).content.decode("utf-8")
+            data_html = httpGet(self.src_api.format(aid=self.aid,pid=self.pid),
+                                cookies=Config.getCookie("kakadm")).content.decode("utf-8")
             self.src = re.search(r"vid=(.*)\'",data_html).group()[4:-1:]
         except Exception as e:
             print(e)

@@ -1,6 +1,6 @@
 from sources.base import PictureSource, MediaSource, TextSource
 from sources.bilibili import BilibiliSource
-from utils.http import httpGet, httpPost
+from utils.vhttp import httpGet, httpPost
 from utils.bilibili import videoIdConvertor
 from config import Config
 import re, json

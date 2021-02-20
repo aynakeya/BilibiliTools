@@ -5,7 +5,7 @@ import time
 import qrcode
 
 from config import Config
-from utils.http import httpGet, httpPost
+from utils.vhttp import httpGet, httpPost
 
 
 class videoIdConvertor():
