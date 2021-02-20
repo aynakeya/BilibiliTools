@@ -193,7 +193,7 @@ class biliVideo(BilibiliSource):
         a = Config.commonHeaders.copy()
         a["host"] = "api.bilibili.com"
         data = httpGet(self.playurlApi % (self.bid, cid, qn), headers=Config.commonHeaders,
-                       cookies=Config.commonCookies)
+                       cookies=Config.getCookie("bilibili"))
         if data == None:
             return []
         data = data.json()
@@ -286,7 +286,7 @@ class biliBangumi(biliVideo):
         if cid == 0:
             return urls
         data = httpGet(self.playurlApi % (self.bid, cid, qn), headers=Config.commonHeaders,
-                       cookies=Config.commonCookies)
+                       cookies=Config.getCookie("bilibili"))
         if data == None:
             return urls
         data = data.json()

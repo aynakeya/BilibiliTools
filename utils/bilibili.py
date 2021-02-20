@@ -60,9 +60,9 @@ class QrLogin():
         print("Please scan qrcode using your application")
         if ql.getResult():
             print("login success, you Sessdata is %s" % ql.getSessdata())
-            Config.commonCookies["SESSDATA"] = ql.getSessdata()
+            Config.getCookie("bilibili")["SESSDATA"] = ql.getSessdata()
             if input("write to the config? y/n ") == "y":
-                ql.writeToConfig()
+                Config.saveCookie()
         else:
             print("fail, please try again")
 
@@ -74,7 +74,7 @@ class QrLogin():
 
     @classmethod
     def isLogin(cls):
-        return Config.commonCookies != ""
+        return Config.getCookie("bilibili").get("SESSDATA") != None
         # resp = httpGet(cls.infoApi,cookies=Config.commonCookies)
         # try:
         #     print(resp.json())
@@ -111,12 +111,6 @@ class QrLogin():
     def getSessdata(self):
         pattern = r"SESSDATA=(.*?)&"
         return "" if re.search(pattern,self.urldata) == None else re.search(pattern,self.urldata).group()[9:-1:]
-    def writeToConfig(self):
-        pattern = r"SESSDATA(\s)*\=(\s)*(.*?)\n"
-        with open("config.py","r+",encoding="utf8") as f:
-            text = f.read()
-            f.seek(0)
-            f.write(re.sub(pattern,"SESSDATA = \"%s\"\n" % self.getSessdata(),text,1))
 
     def isValid(self):
         return self.oauthKey != ""

@@ -16,7 +16,7 @@ class biliDynamic:
     def getMy(self):
         pass
 
-    def getMyNew(self,cookie=Config.commonCookies):
+    def getMyNew(self,cookie=Config.getCookie("bilibili")):
         resp = httpGet(self.dynamicApi, cookies=cookie)
         if resp == None:
             return []

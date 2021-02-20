@@ -11,7 +11,8 @@ class MPV(BaseModule):
                               biliVideo,
                               biliBangumi,
                               biliAudio,
-                              ImomoeSource)
+                              ImomoeSource,
+                              KakadmSource)
 
     def getMethod(self):
         return {"mpv": "Play by mpv"}

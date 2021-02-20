@@ -8,22 +8,24 @@ from sources.base import SourceSelector, BaseSource
 from utils.command import OptionParser
 
 
-class Wenku8(BaseModule):
-    name = "Wenku8"
-    selector = SourceSelector(Wenku8TXT)
+class UniversalDownload(BaseModule):
+    name = "UniversalDownload"
+    selector = SourceSelector(Wenku8TXT,
+                              KakadmSource,
+                              ImomoeSource)
 
     def __init__(self):
         self.availableDl = {}
 
 
     def getMethod(self):
-        return {"wenku8": "Download wenku8 novel."}
+        return {"download": "universal download command."}
 
     def getOptions(self):
         return {
             "-{source name}": ["download the source by name",
                    "Available source name: ",
-                   ["· text"]],
+                   ["· text","· video"]],
             "-downloader=downloadername": ["use specific downloader.",
                             "Available downloaders:",
                             ["· aria2 - aria2",
@@ -73,4 +75,4 @@ class Wenku8(BaseModule):
                     s = val
                     s.download(downloader,Config.saveroute)
 
-exports = [Wenku8]
+exports = [UniversalDownload]

@@ -111,7 +111,7 @@ class Login(BaseModule):
         return {"qrlogin":"get cookie using qrcode login"}
 
     def prepare(self):
-        if Config.SESSDATA == "":
+        if not QrLogin.isLogin():
             if input("We found that there is no sessdata included, would you like to login using qrcode y/n ?") == "y":
                 QrLogin.manuallylogin()
 

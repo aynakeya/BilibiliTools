@@ -11,7 +11,8 @@ class Info(BaseModule):
                               biliAudio,
                               biliBangumi,
                               Wenku8TXT,
-                              ImomoeSource)
+                              ImomoeSource,
+                              KakadmSource)
 
     def getMethod(self):
         return {"info": "Print out basic information."}
