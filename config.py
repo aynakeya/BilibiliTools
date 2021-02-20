@@ -14,7 +14,7 @@ class ConfigFile:
     saveroute = r"D:\Download\bilidown"
     cookiePath = "cookies"
 
-    aria2rpc = "http://localhost:16800/rpc"
+    aria2rpc = "http://localhost:6800/rpc"
     # if no token provide, using None
     aria2token = None
 
