@@ -5,7 +5,7 @@ class Config:
     }
 
     # 如果没有就不要填不然会报错
-    SESSDATA = "fd86fe3c%2C1629279204%2Cef4b0%2A21"
+    SESSDATA = ""
 
     saveroute = r"D:\Download\bilidown"
 
