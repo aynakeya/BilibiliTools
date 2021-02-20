@@ -16,7 +16,7 @@ class Wenku8TXT(Wenku8Source):
 
     download_api = "http://dl.wenku8.com/down.php?type=utf8&id={id}"
 
-    pattern = r"[0-9]+\.htm"
+    pattern = r"www\.wenku8\.net/book/[0-9]+\.htm"
 
     def __init__(self,id):
         self.bid = id
@@ -43,8 +43,12 @@ class Wenku8TXT(Wenku8Source):
 
     @classmethod
     def initFromUrl(cls,url):
-        return cls(re.search(cls.pattern, url).group()[:-4:]) \
-            if re.search(cls.pattern, url) !=None else cls("")
+        rs = re.search(cls.pattern, url)
+        if rs == None: cls("")
+        rs = rs.group().replace(".htm","")\
+            .replace("www.wenku8.net/book/","")
+        return cls(rs)
+
     @classmethod
     def applicable(cls, url):
         return re.search(cls.pattern, url) != None

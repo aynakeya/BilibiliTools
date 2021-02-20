@@ -18,3 +18,6 @@ def writeToFile(content,route,name,binary=False):
     else:
         with open(path, "w+") as f:
             f.write(content)
+
+def getSuffixByUrl(url):
+    return url.split(".")[-1]

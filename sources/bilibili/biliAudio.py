@@ -16,9 +16,6 @@ class biliAudio(BilibiliSource):
                'Accept': "*/*",
                'Connection': "keep-alive"}
 
-    downloadable = True
-    watchable = True
-
     def __init__(self, sid):
         self.sid = sid
         self.title = ""
@@ -123,8 +120,6 @@ class biliAudioList(BilibiliSource):
     pattern = r"am[0-9]+"
     infoApi = "https://www.bilibili.com/audio/music-service-c/web/song/of-menu?ps=100&sid=%s&pn=%s"
 
-    downloadable = True
-    watchable = False
 
     def __init__(self, sid):
         self.sid = sid

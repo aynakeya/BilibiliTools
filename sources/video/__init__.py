@@ -1,16 +1,12 @@
 from sources.base import CommonSource
 
 
-class BilibiliSource(CommonSource):
+class VideoSource(CommonSource):
     name = "base"
 
     @classmethod
     def getSourceName(cls):
-        return "bilibili.%s" % cls.name
-
-    @property
-    def id(self):
-        return None
+        return "video.%s" % cls.name
 
     def isValid(self):
         return False

@@ -4,12 +4,14 @@ from sources import *
 
 
 class Info(BaseModule):
+    name = "Info"
     selector = SourceSelector(biliLive,
                               biliVideo,
                               biliAudioList,
                               biliAudio,
                               biliBangumi,
-                              Wenku8TXT)
+                              Wenku8TXT,
+                              ImomoeSource)
 
     def getMethod(self):
         return {"info": "Print out basic information."}
@@ -31,4 +33,4 @@ class Info(BaseModule):
             else:
                 self.info("Url %s may not be available now" % url)
 
-module = Info
+exports = [Info]

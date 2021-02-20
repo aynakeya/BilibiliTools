@@ -19,7 +19,7 @@ class Config:
     useDownloader = {"aria2": True,
                      "requests": True}
 
-    useModules = ["Login", "VideoIdConverter", "Info", "Download", "MPV","Wenku8"]
+    useModules = ["Bilibili", "Info", "Bilibili", "MPV","Wenku8"]
 
     defaultQuality = 120
     commonCookies = {

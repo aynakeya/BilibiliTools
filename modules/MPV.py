@@ -6,12 +6,12 @@ from sources import *
 
 
 class MPV(BaseModule):
+    name = "MPV"
     selector = SourceSelector(biliLive,
                               biliVideo,
                               biliBangumi,
                               biliAudio,
-                              biliAudioList)
-    playable = ["video","audio"]
+                              ImomoeSource)
 
     def getMethod(self):
         return {"mpv": "Play by mpv"}
@@ -21,10 +21,10 @@ class MPV(BaseModule):
                   ",".join("\"%s:%s\"" %(x,y) for x,y in headers.items())
 
     def getPlayableSource(self,sources:dict):
-        for s in self.playable:
-            for key,val in sources.items():
-                if key == s:
-                    return val
+        for val in sources.values():
+            val:BaseSource
+            if val.watchable:
+                return val
         return None
 
     def playByMPV(self,source:CommonSource):
@@ -35,6 +35,7 @@ class MPV(BaseModule):
         title = bs.filename
         if len(bs.filename.split(".")) >1:
             title = ".".join(bs.filename.split(".")[:-1:])
+        self.info("starting mpv")
         subprocess.Popen("mpv --force-media-title=\"%s\" %s \"%s\"" %(title,
                                                                       self.mpvHeaderString(bs.headers),
                                                                       bs.url))
@@ -50,15 +51,11 @@ class MPV(BaseModule):
         if s == None:
             self.info("%s not support" % url)
             return
-        if not s.watchable:
-            self.info("%s not support" % url)
-            return
         s.load()
         if s.isValid():
-            self.info("starting mpv")
             self.playByMPV(s)
         else:
             self.info("this url may not be available now")
 
 
-module = MPV
+exports = [MPV]

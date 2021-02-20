@@ -13,9 +13,6 @@ class biliLive(BilibiliSource):
 
     baseUrl = "https://live.bilibili.com/%s"
 
-    downloadable = False
-    watchable = True
-
     # from https://github.com/wbt5/real-url/blob/master/bilibili.py
     def __init__(self, rid):
         self.rid = rid

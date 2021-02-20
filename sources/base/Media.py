@@ -4,6 +4,9 @@ from sources.base import BaseSource
 class MediaSource(BaseSource):
     name = "media"
 
+    downloadable = True
+    watchable = True
+
     def __init__(self,url,headers,filename):
         self.url = url
         self.headers = headers

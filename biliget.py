@@ -20,12 +20,10 @@ def infoParser(msg,offset,step):
                       else infoParser(x,offset=offset+step,step=step),
                       msg)
 
-modules: Dict[str, BaseModule] = dict((m.__name__,m()) for m in modulelist)
+modules: Dict[str, BaseModule] = dict((m.name,m()) for m in modulelist)
 methods: Dict[str, BaseModule] = {"help":None,
                                   "quit":None}
 methods.update(dict((key,m)for m in modules.values() for key in m.getMethod().keys()))
-
-
 
 if __name__ == "__main__":
     for module in modules.values():

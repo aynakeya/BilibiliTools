@@ -2,6 +2,10 @@ class CommonSource():
     name = None
 
     @classmethod
+    def initFromUrl(cls,url):
+        pass
+
+    @classmethod
     def getSourceName(cls):
         return cls.name
 
@@ -15,12 +19,16 @@ class CommonSource():
     def load(self):
         pass
 
+    @classmethod
     def applicable(cls, url):
         return False
 
 
 class BaseSource(CommonSource):
     name = "base"
+
+    downloadable = False
+    watchable = False
 
     def __init__(self):
         self.url = ""

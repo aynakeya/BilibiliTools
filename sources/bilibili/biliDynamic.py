@@ -7,9 +7,6 @@ class biliDynamic:
 
     dynamicApi = "https://api.vc.bilibili.com/dynamic_svr/v1/dynamic_svr/dynamic_new?type_list=268435455"
 
-    downloadable = False
-    watchable = False
-
     def __init__(self):
         pass
 

@@ -9,6 +9,7 @@ from utils.command import OptionParser
 
 
 class Wenku8(BaseModule):
+    name = "Wenku8"
     selector = SourceSelector(Wenku8TXT)
 
     def __init__(self):
@@ -72,4 +73,4 @@ class Wenku8(BaseModule):
                     s = val
                     s.download(downloader,Config.saveroute)
 
-module = Wenku8
+exports = [Wenku8]

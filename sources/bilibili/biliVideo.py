@@ -12,9 +12,6 @@ class biliVideo(BilibiliSource):
     patternAv = r"av[0-9]+"
     patternBv = r"BV[0-9,A-Z,a-z]+"
 
-    downloadable = True
-    watchable = True
-
     '''{'quality': 120, 'type': 'FLV', 'desc': '超清 4K'},'''
     qualities = [{'quality': 120, 'type': 'FLV', 'desc': '超清 4K',"cookie": True},
                  {'quality': 116, 'type': 'FLV', 'desc': '高清 1080P60', "cookie": True},
