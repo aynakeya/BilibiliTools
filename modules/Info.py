@@ -1,6 +1,15 @@
 from modules import BaseModule
-from models import modelSelector
+from sources.base import SourceSelector
+from sources import *
+
+
 class Info(BaseModule):
+    selector = SourceSelector(biliLive,
+                              biliVideo,
+                              biliAudioList,
+                              biliAudio,
+                              biliBangumi,
+                              Wenku8TXT)
 
     def getMethod(self):
         return {"info": "Print out basic information."}
@@ -8,14 +17,15 @@ class Info(BaseModule):
     def process(self, args):
         for url in [s for s in args.split(" ")[1:] if s != ""]:
             self.info("Start to get information of %s" % url)
-            m = modelSelector(url).initFromUrl(url) if modelSelector(url) != None else None
-            if m == None:
+            s =  self.selector.select(url)
+            s =s.initFromUrl(url) if s != None else None
+            if s == None:
                 self.info("Url %s not support" % url)
                 continue
-            m.getInfo()
-            if m.isValid():
+            s.load()
+            if s.isValid():
                 self.info("--")
-                for key, value in m.dumpInfo():
+                for key, value in s.info:
                     print("%s: %s" % (key,value))
                 self.info("--")
             else:

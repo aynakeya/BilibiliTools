@@ -1,6 +1,6 @@
 from modules import BaseModule
 from config import Config
-from utils import QrLogin
+from utils.bilibili import QrLogin
 
 class Login(BaseModule):
 
@@ -8,7 +8,7 @@ class Login(BaseModule):
         return {"qrlogin":"get cookie using qrcode login"}
 
     def prepare(self):
-        if Config.commonCookies["SESSDATA"] == "":
+        if Config.SESSDATA == "":
             if input("We found that there is no sessdata included, would you like to login using qrcode y/n ?") == "y":
                 QrLogin.manuallylogin()
 

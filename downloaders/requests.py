@@ -1,16 +1,17 @@
 from config import Config
-from utils import filenameparser,httpGet
+from downloaders import BaseDownloader
+from utils import http,file
 import os
 
-class requestsDownloader():
+class requestsDownloader(BaseDownloader):
     name = "requests"
 
     def __init__(self):
         pass
 
     def download(self, url, route, filename,**kwargs):
-        fn = filenameparser(filename)
-        raw_data = httpGet(url, **kwargs)
+        fn = file.parseFilename(filename)
+        raw_data = http.httpGet(url, **kwargs)
         if raw_data == None:
             return False
         path = os.path.join(route, fn)

@@ -8,46 +8,25 @@ from sources.base import SourceSelector, BaseSource
 from utils.command import OptionParser
 
 
-class Download(BaseModule):
-    selector = SourceSelector(biliVideo,
-                              biliAudio,
-                              biliBangumi,
-                              biliAudioList)
+class Wenku8(BaseModule):
+    selector = SourceSelector(Wenku8TXT)
 
     def __init__(self):
         self.availableDl = {}
 
 
     def getMethod(self):
-        return {"bdl": "Download bilibili video or audio (support video audio audiolist bangumi)."}
+        return {"wenku8": "Download wenku8 novel."}
 
     def getOptions(self):
         return {
             "-{source name}": ["download the source by name",
                    "Available source name: ",
-                   ["· video","· audio","· lyric","· cover","· damu"]],
+                   ["· text"]],
             "-downloader=downloadername": ["use specific downloader.",
                             "Available downloaders:",
                             ["· aria2 - aria2",
-                            "· requests - native requests downloader"]],
-            "-option=value":["specify option for download",
-                             ["video options:",
-                              ["-page=page: specify which page",
-                               "-qn=quality: specify which quality",
-                               ["· %s - %s %s" % (
-                                   x["quality"],
-                                   x["desc"],
-                                   "(SESSDATA Required)" if x["cookie"] else ""
-                               ) for x in biliVideo.qualities],
-                               "-all=1: download all page"
-                               ],
-                              "audio options:",
-                              ["-qn=quality: specify which quality",
-                               ["· 2 - 320k 高品质","· 1 - 196k 标准","· 0 - 128k 流畅"]
-                               ],
-                              ]
-                             ]
-
+                            "· requests - native requests downloader"]]
         }
 
     def prepare(self):
@@ -60,20 +39,11 @@ class Download(BaseModule):
 
         kwargs = {}
         downloader = self.availableDl.get(Config.defaultDownloader)
-        kwargs["qn"] = Config.defaultQuality
         target_source = []
         for key, value in options.options.items():
             if value == "":
                 target_source.append(key)
                 continue
-            if key == "page" :
-                kwargs["page"] = int(value)
-            if key == "qn":
-                kwargs["qn"] = int(value)
-            if key == "all":
-                kwargs["all"] = bool(int(value))
-            if key == "downloader":
-                downloader = self.availableDl.get(value)
         if downloader == None:
             self.info("Downloader didn't found")
             return
@@ -82,9 +52,6 @@ class Download(BaseModule):
             s = self.selector.select(url)
             s = s.initFromUrl(url) if s != None else None
             if s == None:
-                self.info("%s not support" % url)
-                continue
-            if not s.downloadable:
                 self.info("%s not support" % url)
                 continue
             s.load(**kwargs)
@@ -105,4 +72,4 @@ class Download(BaseModule):
                     s = val
                     s.download(downloader,Config.saveroute)
 
-module = Download
+module = Wenku8

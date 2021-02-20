@@ -23,4 +23,5 @@ for f in glob.glob(join(dirname(__file__), "*.py")):
     name = basename(f)[:-3:]
     if isfile(f) and not f.endswith('__init__.py') and name in Config.useModules:
         modules.append(importlib.import_module("."+name,"modules").module)
+
 modules.sort(key=lambda m:Config.useModules.index(m.__name__))
