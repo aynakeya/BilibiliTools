@@ -173,11 +173,11 @@ class VideoIdConverter(BaseModule):
         return ""
 
     def getMethod(self):
-        return {"convert":"convert between bv and av"}
+        return {"bidconvert":"convert between bv and av"}
 
 
     def process(self, args):
-        for url in [s for s in args.split(" ")[1:] if s != ""]:
+        for url in OptionParser(args).args:
             urla = self.urlConvert(url)
             if urla == "":
                 self.info("%s is not a proper video id" % url)

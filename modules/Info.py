@@ -1,6 +1,7 @@
 from modules import BaseModule
 from sources.base import SourceSelector
 from sources import *
+from utils.command import OptionParser
 
 
 class Info(BaseModule):
@@ -18,7 +19,7 @@ class Info(BaseModule):
         return {"info": "Print out basic information."}
 
     def process(self, args):
-        for url in [s for s in args.split(" ")[1:] if s != ""]:
+        for url in OptionParser(args).args:
             self.info("Start to get information of %s" % url)
             s =  self.selector.select(url)
             s =s.initFromUrl(url) if s != None else None
@@ -29,7 +30,7 @@ class Info(BaseModule):
             if s.isValid():
                 self.info("--")
                 for key, value in s.info:
-                    print("%s: %s" % (key,value))
+                    self.info("%s: %s" % (key,value),prefix=False)
                 self.info("--")
             else:
                 self.info("Url %s may not be available now" % url)

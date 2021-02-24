@@ -3,6 +3,7 @@ import subprocess
 
 from sources.base import BaseSource, SourceSelector, CommonSource
 from sources import *
+from utils.command import OptionParser
 
 
 class MPV(BaseModule):
@@ -42,11 +43,11 @@ class MPV(BaseModule):
                                                                       bs.url))
 
     def process(self, args):
-        args = args.split(" ")[1:]
-        if (len(args) < 1):
+        ops = OptionParser(args)
+        if (len(ops.args) < 1):
             self.info("no url provided")
             return
-        url = args[0]
+        url = ops.args[0]
         s = self.selector.select(url)
         s = s.initFromUrl(url) if s != None else None
         if s == None:

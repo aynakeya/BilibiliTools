@@ -22,8 +22,11 @@ class BaseModule:
     def process(self, args):
         pass
 
-    def info(self,msg):
-        self.output_func("BilibiliTools - %s > %s" %(self.__class__.__name__,msg))
+    def info(self,msg,prefix=True):
+        if prefix:
+            self.output_func("BilibiliTools - %s > %s" %(self.__class__.__name__,msg))
+        else:
+            self.output_func(msg)
 
 for f in glob.glob(join(dirname(__file__), "*.py")):
     name = basename(f)[:-3:]
