@@ -20,6 +20,20 @@
 
 已完全重构
 
+重构
+
+现在由几步构成
+
+1. downloader 下载器
+2. modules 命令模组
+3. sources 下载源
+
+具体如下
+
+biliget 会读取需要加载的module, module里使用SourceSelector选择对应的source
+
+在获取BaseSource后调用download进行下载。
+
 支持bilibili视频，封面，收藏夹，音乐，歌词，音乐封面.
 
 支持下载番剧.
