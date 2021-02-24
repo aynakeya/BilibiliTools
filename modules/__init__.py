@@ -4,6 +4,9 @@ import glob,importlib
 modules = []
 
 class BaseModule:
+    running_mode = "console"
+    output_func = print
+
     def getMethod(self):
         return {}
 
@@ -13,11 +16,14 @@ class BaseModule:
     def prepare(self):
         pass
 
+    def require(self):
+        pass
+
     def process(self, args):
         pass
 
     def info(self,msg):
-        print("BilibiliTools - %s > %s" %(self.__class__.__name__,msg))
+        self.output_func("BilibiliTools - %s > %s" %(self.__class__.__name__,msg))
 
 for f in glob.glob(join(dirname(__file__), "*.py")):
     name = basename(f)[:-3:]

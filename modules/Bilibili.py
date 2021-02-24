@@ -27,7 +27,7 @@ class Download(BaseModule):
         return {
             "-{source name}": ["download the source by name",
                    "Available source name: ",
-                   ["· video","· audio","· lyric","· cover","· damu"]],
+                   ["· video","· audio","· lyric","· cover","· danmu"]],
             "-downloader=downloadername": ["use specific downloader.",
                             "Available downloaders:",
                             ["· aria2 - aria2",
@@ -96,13 +96,17 @@ class Download(BaseModule):
     def _download_source(self,downloader:BaseDownloader,target_source:list,sources:dict):
         for key,val in sources.items():
             if key in target_source:
+                if key == "danmu":
+                    d = self.availableDl.get("requests")
+                else:
+                    d = downloader
                 s: BaseSource
                 if isinstance(val,list):
                     for s in val:
-                        s.download(downloader,Config.saveroute)
+                        s.download(d,Config.saveroute)
                 else:
                     s = val
-                    s.download(downloader,Config.saveroute)
+                    s.download(d,Config.saveroute)
 
 class Login(BaseModule):
     name = "Bilibili.Login"
@@ -110,13 +114,28 @@ class Login(BaseModule):
     def getMethod(self):
         return {"qrlogin":"get cookie using qrcode login"}
 
-    def prepare(self):
-        if not QrLogin.isLogin():
-            if input("We found that there is no sessdata included, would you like to login using qrcode y/n ?") == "y":
-                QrLogin.manuallylogin()
+    def require(self):
+        if self.running_mode == "console":
+            if not QrLogin.isLogin():
+                if input(
+                        "We found that there is no sessdata included, would you like to login using qrcode y/n ?") == "y":
+                    QrLogin.manuallylogin()
+
 
     def process(self, args):
-        QrLogin.manuallylogin()
+        if self.running_mode == "console":
+            QrLogin.manuallylogin()
+        else:
+            ql = QrLogin()
+            self.info("getting qrcode")
+            ql.getQrcode()
+            self.info("Please scan qrcode using your application")
+            if ql.getResult():
+                self.info("login success, you Sessdata is %s" % ql.getSessdata())
+                Config.getCookie("bilibili")["SESSDATA"] = ql.getSessdata()
+                Config.saveCookie()
+            else:
+                self.info("fail, please try again")
 
 class VideoIdConverter(BaseModule):
     name = "Bilibili.VideoIdConverter"

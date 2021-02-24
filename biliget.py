@@ -28,6 +28,7 @@ methods.update(dict((key,m)for m in modules.values() for key in m.getMethod().ke
 if __name__ == "__main__":
     for module in modules.values():
         module.prepare()
+        module.require()
     while True:
         command = input("-> ")
         method = command.split(" ")[0]

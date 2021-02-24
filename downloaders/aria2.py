@@ -14,6 +14,7 @@ class ariaDownloader(BaseDownloader):
     def download(self, url, route, filename, **kwargs):
         kwargs["dir"] = route
         kwargs["out"] = parseFilename(filename)
+
         if "headers" in kwargs.keys():
             kwargs["header"] = self.parseHeader(kwargs.pop("headers"))
         self.rpc.addUri([url], kwargs)

@@ -22,6 +22,7 @@ class KakadmSource(VideoSource):
     def __init__(self,aid,pid):
         self.aid = aid
         self.pid = pid
+        self.pid_list = []
         self.title = ""
         self.src = ""
         self.episodes = {}
@@ -47,7 +48,8 @@ class KakadmSource(VideoSource):
     @property
     def info(self):
         return [("Type", self.name),
-                ("Title", self.title)
+                ("Title", self.title),
+                ("Total Page",len(self.pid_list))
                 ]
 
     @property
@@ -57,8 +59,16 @@ class KakadmSource(VideoSource):
     def isValid(self):
         return self.src != ""
 
-    def getBaseSources(self,**kwargs):
-        return {"video":self.getVideo()}
+    def getBaseSources(self,all=False,**kwargs):
+        if all:
+            videos = []
+            for pid in self.pid_list:
+                kks = KakadmSource(self.aid,pid)
+                kks.load()
+                videos.append(kks.getVideo())
+            return {"video":videos}
+        else:
+            return {"video":self.getVideo()}
 
     def getVideo(self):
         try:
@@ -76,11 +86,13 @@ class KakadmSource(VideoSource):
         try:
             raw_html = httpGet(self.player_url.format(aid=self.aid,pid=self.pid),
                                cookies=Config.getCookie("kakadm"))
-            html_text= raw_html.content.decode("utf-8")
-            self.title = re.search(r"play_title=\"(.*)\";",html_text).group()[12:-2:]
+            html_text= raw_html.content.decode("utf-8").replace("\r","").replace("\n","")
+            self.title = re.search(r"play_title=\"((?!\";).)*\";",html_text).group()[12:-2:]
             data_html = httpGet(self.src_api.format(aid=self.aid,pid=self.pid),
                                 cookies=Config.getCookie("kakadm")).content.decode("utf-8")
             self.src = re.search(r"vid=(.*)\'",data_html).group()[4:-1:]
+            movulrs = re.search(r"<div class=\"movurls\">((?!</div>).)*</div>",html_text).group()
+            self.pid_list = [str(i) for i in range(1,movulrs.count("</li>")+1)]
         except Exception as e:
             print(e)
             pass

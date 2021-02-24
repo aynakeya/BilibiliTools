@@ -29,7 +29,15 @@ class biliVideo(BilibiliSource):
     pagesApi = "https://api.bilibili.com/x/player/pagelist?bvid=%s"
     detailApi = "https://api.bilibili.com/x/web-interface/view/detail?bvid=%s&aid=&jsonp=jsonp"
     playurlApi = "https://api.bilibili.com/x/player/playurl?avid=&bvid=%s&cid=%s&qn=%s&type=&otype=json&fourk=1"
-    dmApi = "https://api.bilibili.com/x/v1/dm/list.so?oid=%s"
+    dmApi = "http://comment.bilibili.com/%s.xml"
+
+    extraHeaders = {"referer":"https://www.bilibili.com"}
+
+    @classmethod
+    def getHeader(cls,header):
+        tmp = header.copy()
+        tmp.update(cls.extraHeaders)
+        return tmp
 
     def __init__(self, bid):
         self.bid = bid
@@ -98,15 +106,15 @@ class biliVideo(BilibiliSource):
             return PictureSource(self.cover_url, {}, ".".join([self.title, suffix]), "")
 
     @property
-    def damu(self):
-        return self.getDamu()
+    def danmu(self):
+        return self.getDanmu()
 
-    def getDamu(self, page=0):
+    def getDanmu(self, page=0):
         if page == 0:
             page = self.currentPage
         return TextSource(self.dmApi % self._getPageCid(page),
                           Config.commonHeaders,
-                          self._parseTitle("damu", page, "xml"),
+                          self._parseTitle("danmu", page, "xml"),
                           "")
 
     @property
@@ -116,6 +124,8 @@ class biliVideo(BilibiliSource):
             qs += "%s: %s(%s)\n" % (key, value[1], value[0])
         return [("Type", self.name),
                 ("Title", self.title),
+                ("Bid",self.bid),
+                ("Cid",self._getPageCid(self.currentPage)),
                 ("Uploader", self.uploader),
                 ("Available Qualities", qs),
                 ("Total page",
@@ -179,10 +189,10 @@ class biliVideo(BilibiliSource):
         if all:
             return {"video": [self.getVideo(page=p,qn=qn)
                                for p in range(1,len(self.pages)+1)],
-                "damu": self.getDamu(page=page),
+                "danmu": self.getDanmu(page=page),
                 "cover": self.cover}
         return {"video": self.getVideo(page=page,qn=qn),
-                "damu": self.getDamu(page=page),
+                "danmu": self.getDanmu(page=page),
                 "cover": self.cover}
 
     def _getPlayurl(self, page, qn):
@@ -190,9 +200,7 @@ class biliVideo(BilibiliSource):
         cid = self._getPageCid(page)
         if cid == 0:
             return []
-        a = Config.commonHeaders.copy()
-        a["host"] = "api.bilibili.com"
-        data = httpGet(self.playurlApi % (self.bid, cid, qn), headers=Config.commonHeaders,
+        data = httpGet(self.playurlApi % (self.bid, cid, qn), headers=self.getHeader(Config.commonHeaders),
                        cookies=Config.getCookie("bilibili"))
         if data == None:
             return []
@@ -215,7 +223,7 @@ class biliVideo(BilibiliSource):
                 return ".".join([self.title + " - " + self.uploader, suffix])
         if (type == "cover"):
             return ".".join([self.title, suffix])
-        if (type == "damu"):
+        if (type == "danmu"):
             if (len(self.pages) > 1):
                 return ".".join(["%s (P%s %s) - %s" % (self.title, page, self._getPageName(page), self.uploader), "xml"])
             else:
@@ -245,6 +253,8 @@ class biliBangumi(biliVideo):
             qs += "%s : %s(%s)\n" % (key, value[1], value[0])
         return [("Type", self.name),
                 ("Title", self.title),
+                ("Bid", self.bid),
+                ("Cid", self._getPageCid(self.currentPage)),
                 ("Current Episode", self._getPageName(self.currentPage)),
                 ("Available Qualities", qs),
                 ("Total page", str(len(self.pages)) + "\n" + "\n".join(x["pagename"] for x in self.pages))
@@ -285,7 +295,8 @@ class biliBangumi(biliVideo):
         cid = self._getPageCid(page)
         if cid == 0:
             return urls
-        data = httpGet(self.playurlApi % (self.bid, cid, qn), headers=Config.commonHeaders,
+
+        data = httpGet(self.playurlApi % (self.bid, cid, qn), headers=self.getHeader(Config.commonHeaders),
                        cookies=Config.getCookie("bilibili"))
         if data == None:
             return urls
@@ -332,7 +343,7 @@ class biliBangumi(biliVideo):
             return ".".join(["%s: %s" % (self.title, self._getPageName(page)), suffix])
         if (type == "cover"):
             return ".".join([self.title, suffix])
-        if (type == "damu"):
+        if (type == "danmu"):
             return ".".join(["%s: %s" % (self.title, self._getPageName(page)), suffix])
 
 

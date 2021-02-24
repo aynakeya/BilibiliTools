@@ -1,7 +1,7 @@
 from config import Config
 from sources import MediaSource
 from sources.video import VideoSource
-from utils import file
+from utils import file, formats
 import re,json
 
 from utils.vhttp import httpGet
@@ -88,10 +88,10 @@ class ImomoeSource(VideoSource):
             raw_html = httpGet(self.player_url.format(id=self.id_format
                                                       .format(id=self.id, sid=self.source_id, ep_id=self.ep_id)))
             if raw_html == None: return
-            html_text= raw_html.content.decode("gb2312")
+            html_text= formats.autoDecode(raw_html.content)
             self.title = re.search(r"xTitle='(.*)'",html_text).group()[8:-1:]
             playdata_url = re.search(r"src=\"/playdata/(.*)\"",html_text).group()[4:-1:]
-            playdata = httpGet(self.base_url+playdata_url[1::]).content.decode("gb2312")
+            playdata = formats.autoDecode(httpGet(self.base_url+playdata_url[1::]).content)
             videolist = re.search(r"=\[(.*)\],",playdata).group()[1:-1:].replace("'","\"")
             for index,part in enumerate(json.loads(videolist)):
                 sid = str(index)

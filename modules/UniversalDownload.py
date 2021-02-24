@@ -2,7 +2,6 @@ from modules import BaseModule
 from config import Config
 from downloaders import downloaders, BaseDownloader
 from sources import *
-import getopt
 
 from sources.base import SourceSelector, BaseSource
 from utils.command import OptionParser
@@ -47,6 +46,9 @@ class UniversalDownload(BaseModule):
             if value == "":
                 target_source.append(key)
                 continue
+            kwargs[key] = value
+            if key == "all":
+                kwargs["all"] = bool(int(value))
         if downloader == None:
             self.info("Downloader didn't found")
             return

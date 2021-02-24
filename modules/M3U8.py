@@ -31,13 +31,13 @@ class M3U8(BaseModule):
                 self.info("combineing %s" % path)
                 com_func(path)
                 self.info("success")
-                return
+                continue
             downpath = os.path.join(Config.saveroute,path)
             if os.path.exists(downpath):
                 self.info("combining %s" % downpath)
                 com_func(downpath)
                 self.info("success")
-                return
+                continue
             self.info("not a valid path")
 
 exports = [M3U8]

@@ -5,8 +5,9 @@ import os
 class ConfigFile:
     proxies = {"http": "http://127.0.0.1:10809"}
     useProxy = False
+    downloadProxy = False
     commonHeaders = {
-        "user-agent": "Mozilla/5.0 (Windows NT 10.0; WOW64; rv:51.0) Gecko/20100101 Firefox/51.0",
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; WOW64; rv:51.0) Gecko/20100101 Firefox/51.0"
     }
 
     commonCookies = {}
@@ -14,7 +15,7 @@ class ConfigFile:
     saveroute = r"D:\Download\bilidown"
     cookiePath = "cookies"
 
-    aria2rpc = "http://localhost:6800/rpc"
+    aria2rpc = "http://localhost:16800/rpc"
     # if no token provide, using None
     aria2token = None
 

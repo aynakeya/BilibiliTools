@@ -46,7 +46,7 @@ class QrLogin():
     qrApi = "https://passport.bilibili.com/qrcode/getLoginUrl"
     checkQrApi = "https://passport.bilibili.com/qrcode/getLoginInfo"
 
-    def __init__(self,invert,console):
+    def __init__(self,invert=False,console=False):
         self.invert = invert
         self.console = console
         self.oauthKey = ""
@@ -114,3 +114,7 @@ class QrLogin():
 
     def isValid(self):
         return self.oauthKey != ""
+
+
+def danmuass(path):
+    pass

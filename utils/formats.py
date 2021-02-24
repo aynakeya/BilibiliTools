@@ -24,3 +24,12 @@ def m3u8FFmpegCombine(route):
     filelist = os.path.join(route, "filelist.txt")
     subprocess.run("ffmpeg -f concat -safe 0 -i {filelist} -c copy {target}"
                      .format(filelist=filelist, target=target_file))
+
+def autoDecode(bin_content:bytes):
+    codec = ["utf-8","gbk","gb2312"]
+    for c in codec:
+        try:
+            return bin_content.decode(c)
+        except:
+            pass
+    return None
