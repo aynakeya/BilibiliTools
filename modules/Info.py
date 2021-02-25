@@ -29,8 +29,12 @@ class Info(BaseModule):
             s.load()
             if s.isValid():
                 self.info("--")
-                for key, value in s.info:
-                    self.info("%s: %s" % (key,value),prefix=False)
+                for key, value in s.info.items():
+                    if isinstance(value,str):
+                        self.info("%s: %s" % (key,value),prefix=False)
+                    else:
+                        self.info("{}:".format(key),prefix=False)
+                        self.info(value,prefix=False)
                 self.info("--")
             else:
                 self.info("Url %s may not be available now" % url)

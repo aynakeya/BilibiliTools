@@ -25,11 +25,11 @@ class biliLive(BilibiliSource):
 
     @property
     def info(self):
-        return [("Type", self.name),
-                ("Title", self.title),
-                ("Room ID", self.rid),
-                ("Real Room ID", self.room_id),
-                ("Available Formats", "hls,flv")]
+        return {"Type": self.name,
+                "Title": self.title,
+                "Room ID": self.rid,
+                "Real Room ID": self.room_id,
+                "Available Formats": "hls,flv"}
 
     @classmethod
     def applicable(cls, url):

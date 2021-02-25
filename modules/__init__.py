@@ -1,6 +1,9 @@
 from os.path import dirname, basename, isfile, join
 from config import Config
 import glob,importlib
+
+from utils.command import OutputParser
+
 modules = []
 
 class RunningMode():
@@ -9,7 +12,7 @@ class RunningMode():
 
 class BaseModule:
     running_mode = RunningMode.CONSOLE
-    output_func = print
+    output_parser = OutputParser()
 
     def getMethod(self):
         return {}
@@ -26,11 +29,12 @@ class BaseModule:
     def process(self, args):
         pass
 
-    def info(self,msg,prefix=True):
+    def info(self,msg,offset=0,step=3,prefix=True):
         if prefix:
-            self.output_func("BilibiliTools - %s > %s" %(self.__class__.__name__,msg))
+            self.output_parser.print(msg,offset,step,
+                                     prefix="BilibiliTools - {} >".format(self.__class__.__name__))
         else:
-            self.output_func(msg)
+            self.output_parser.print(msg, offset, step)
 
 for f in glob.glob(join(dirname(__file__), "*.py")):
     name = basename(f)[:-3:]

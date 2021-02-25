@@ -1,11 +1,12 @@
 import base64
 
+from sources.base.interface import DownloadableSource
 from utils import file
 from downloaders import BaseDownloader
 from sources.base import BaseSource
 
 
-class PictureSource(BaseSource):
+class PictureSource(BaseSource,DownloadableSource):
     name = "picture"
 
     def __init__(self, url, headers, filename,filecontent):
@@ -13,6 +14,10 @@ class PictureSource(BaseSource):
         self.headers = headers
         self.filename = filename
         self.filecontent = filecontent
+
+    @property
+    def suffix(self):
+        return self.filename.split(".")[-1]
 
     @classmethod
     def initFromBase64(cls,filename,src):

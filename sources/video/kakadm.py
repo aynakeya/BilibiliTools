@@ -47,10 +47,10 @@ class KakadmSource(VideoSource):
 
     @property
     def info(self):
-        return [("Type", self.name),
-                ("Title", self.title),
-                ("Total Page",len(self.pid_list))
-                ]
+        return {"Type": self.name,
+                "Title": self.title,
+                "Total Page":len(self.pid_list)
+                }
 
     @property
     def video(self):

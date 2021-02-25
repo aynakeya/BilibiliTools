@@ -30,11 +30,10 @@ class Wenku8TXT(Wenku8Source):
 
     @property
     def info(self):
-        return [("Type", self.getSourceName()),
-                ("Title", self.title),
-                ("Author", self.author),
-                ("Publisher", self.publisher)]
-
+        return {"Type": self.getSourceName,
+                "Title": self.title,
+                "Author": self.author,
+                "Publisher": self.publisher}
     @property
     def txt(self):
         return TextSource(self.download_api.format(id=self.bid),

@@ -4,13 +4,12 @@ from modules import modules as modulelist
 from modules import BaseModule
 import sys
 
-def info(msg,offset=0,step=3):
-    if isinstance(msg, str):
-        print("BilibiliTools > %s" % infoParser(msg,offset=offset,step=step))
-        return
-    for m in msg:
-        info(m,offset=offset+step,step=step)
+from utils.command import OutputParser
 
+outputP = OutputParser(prefix="BilibiliTools > ")
+
+def info(msg,offset=0,step=3):
+    outputP.print(msg,offset,step)
 
 def infoParser(msg,offset,step):
     if isinstance(msg,str):

@@ -334,3 +334,4 @@ ASALocalRun/
 
 .DS_Store
 /venv/
+/dist/

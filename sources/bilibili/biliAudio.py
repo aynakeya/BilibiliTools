@@ -52,13 +52,11 @@ class biliAudio(BilibiliSource):
 
     @property
     def info(self):
-        qs = ""
-        for key,value in self._getQualities().items():
-            qs += "%s: %s(%s %s)\n" % (key,value[2],value[0],value[1])
-        return [("Type",self.name),
-                ("Title",self.title),
-                ("Uploader",self.uploader),
-                ("Available Qualities",qs)]
+        qs = ["%s: %s(%s %s)" % (key,value[2],value[0],value[1]) for key,value in self._getQualities().items()]
+        return {"Type":self.name,
+                "Title":self.title,
+                "Uploader":self.uploader,
+                "Available Qualities":qs}
 
     @classmethod
     def applicable(cls,url):
@@ -131,8 +129,8 @@ class biliAudioList(BilibiliSource):
 
     @property
     def info(self):
-        return [("Type", self.name),
-                ("Audio number", len(self.audios))]
+        return {"Type": self.name,
+                "Audio number": len(self.audios)}
 
     @classmethod
     def applicable(cls, url):

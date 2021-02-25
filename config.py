@@ -25,7 +25,8 @@ class ConfigFile:
     useDownloader = {"aria2": True,
                      "requests": True}
 
-    useModules = ["Bilibili", "Info", "MPV", "UniversalDownload", "RealUrl", "M3U8"]
+    useModules = ["Bilibili", "Info", "MPV", "UniversalDownload",
+                  "RealUrl", "M3U8","Search"]
 
     defaultQuality = 120
 

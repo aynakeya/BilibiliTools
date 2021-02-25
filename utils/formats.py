@@ -1,5 +1,5 @@
 import m3u8,glob,os,subprocess
-
+import re
 def m3u8Extract(url):
     try:
         m3u8obj = m3u8.load(url)
@@ -25,11 +25,24 @@ def m3u8FFmpegCombine(route):
     subprocess.run("ffmpeg -f concat -safe 0 -i {filelist} -c copy {target}"
                      .format(filelist=filelist, target=target_file))
 
-def autoDecode(bin_content:bytes):
+def htmlGetCharset(bin_content:bytes):
+    try:
+        html_text = bin_content.decode("utf-8", "ignore")
+        return re.search("charset=([^ ;'\">])*[ ;'\"]",html_text).group()[8:-1:]
+    except:
+        return None
+
+def htmlAutoDecode(bin_content:bytes):
     codec = ["utf-8","gbk","gb2312"]
+    c = htmlGetCharset(bin_content)
+    if c != None:
+        return bin_content.decode(c,"ignore")
     for c in codec:
         try:
             return bin_content.decode(c)
         except:
             pass
     return None
+
+def htmlStrip(html_text:str):
+    return html_text.replace("\n","").replace("\r","")

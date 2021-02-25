@@ -30,7 +30,7 @@ class ConsoleGUI():
     def _initialize(self):
         self.gui.getTabController().add(self.widget, text="Conole")
 
-        BaseModule.output_func = self._info
+        BaseModule.output_parser.output_func = self._info
         BaseModule.running_mode = RunningMode.GUI
 
         for module in self.modules.values():
@@ -149,14 +149,17 @@ class ConsoleGUI():
         self.output.delete(0.0, tk.END)
         self.output.config(state=tk.DISABLED)
 
-    def _info(self, msg, offset=0, step=3):
-        if isinstance(msg, str):
-            self.output.config(state=tk.NORMAL)
-            self.output.insert("end", "%s\n" % self._infoParser(msg, offset=offset, step=step))
-            self.output.config(state=tk.DISABLED)
-            return
-        for m in msg:
-            self._info(m, offset=offset + step, step=step)
+    def _info(self, msg):
+        self.output.config(state=tk.NORMAL)
+        self.output.insert("end", "%s\n" % msg)
+        self.output.config(state=tk.DISABLED)
+        # if isinstance(msg, str):
+        #     self.output.config(state=tk.NORMAL)
+        #     self.output.insert("end", "%s\n" % self._infoParser(msg, offset=offset, step=step))
+        #     self.output.config(state=tk.DISABLED)
+        #     return
+        # for m in msg:
+        #     self._info(m, offset=offset + step, step=step)
 
     def _infoParser(self, msg, offset, step):
         if isinstance(msg, str):

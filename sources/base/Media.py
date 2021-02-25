@@ -1,18 +1,20 @@
 from downloaders import BaseDownloader
 from sources.base import BaseSource
+from sources.base.interface import DownloadableSource, WatchableSource
 from utils import formats,file
 import os
 
-class MediaSource(BaseSource):
+class MediaSource(BaseSource,DownloadableSource,WatchableSource):
     name = "media"
-
-    downloadable = True
-    watchable = True
 
     def __init__(self,url,headers,filename):
         self.url = url
         self.headers = headers
         self.filename = filename
+
+    @property
+    def suffix(self):
+        return self.filename.split(".")[-1]
 
     def download(self,downloader:BaseDownloader,saveroute,**kwargs):
         if (self.suffix == "m3u8"):

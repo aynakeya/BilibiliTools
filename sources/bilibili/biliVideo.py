@@ -119,18 +119,17 @@ class biliVideo(BilibiliSource):
 
     @property
     def info(self):
-        qs = "\n"
-        for key, value in self._getQualities().items():
-            qs += "%s: %s(%s)\n" % (key, value[1], value[0])
-        return [("Type", self.name),
-                ("Title", self.title),
-                ("Bid",self.bid),
-                ("Cid",self._getPageCid(self.currentPage)),
-                ("Uploader", self.uploader),
-                ("Available Qualities", qs),
-                ("Total page",
-                 str(len(self.pages)) + "\n" + "\n".join("P%s - %s" % (x["page"], x["pagename"]) for x in self.pages))
-                ]
+        qs = ["%s: %s(%s)" % (key, value[1], value[0])for key, value in self._getQualities().items()]
+        return {"Type": self.name,
+                "Title": self.title,
+                "Bid": self.bid,
+                "Cid": str(self._getPageCid(self.currentPage)),
+                "Uploader": self.uploader,
+                "Current Page": self._getPageName(self.currentPage),
+                "Available Qualities": qs,
+                "Total page": str(len(self.pages)),
+                "Page List":["P%s - %s" % (x["page"], x["pagename"]) for x in self.pages]
+                }
 
     @classmethod
     def applicable(cls, url):
@@ -248,17 +247,16 @@ class biliBangumi(biliVideo):
 
     @property
     def info(self):
-        qs = "\n"
-        for key, value in self._getQualities().items():
-            qs += "%s : %s(%s)\n" % (key, value[1], value[0])
-        return [("Type", self.name),
-                ("Title", self.title),
-                ("Bid", self.bid),
-                ("Cid", self._getPageCid(self.currentPage)),
-                ("Current Episode", self._getPageName(self.currentPage)),
-                ("Available Qualities", qs),
-                ("Total page", str(len(self.pages)) + "\n" + "\n".join(x["pagename"] for x in self.pages))
-                ]
+        qs = ["%s : %s(%s)" % (key, value[1], value[0]) for key, value in self._getQualities().items()]
+        return {"Type": self.name,
+                "Title": self.title,
+                "Bid": self.bid,
+                "Cid": str(self._getPageCid(self.currentPage)),
+                "Current Episode": self._getPageName(self.currentPage),
+                "Available Qualities": qs,
+                "Total page": str(len(self.pages)),
+                "Page List":[x["pagename"] for x in self.pages]
+                }
 
     @classmethod
     def applicable(cls, url):
