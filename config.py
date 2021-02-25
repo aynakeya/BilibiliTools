@@ -3,7 +3,7 @@ import os
 
 
 class ConfigFile:
-    proxies = {"http": "http://127.0.0.1:10809"}
+    proxies = {"http": "http://127.0.0.1:8888"}
     useProxy = False
     downloadProxy = False
     commonHeaders = {
@@ -30,7 +30,7 @@ class ConfigFile:
     defaultQuality = 120
 
     def __init__(self):
-        print("Config initialized")
+        print("Cookie initialized")
         self.cookies = {}
         self.loadCookie()
 

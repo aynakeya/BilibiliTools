@@ -1,4 +1,5 @@
-from modules import BaseModule
+from gui.MPVGUI import MPVGUI
+from modules import BaseModule, RunningMode
 import subprocess
 
 from sources.base import BaseSource, SourceSelector, CommonSource
@@ -17,6 +18,10 @@ class MPV(BaseModule):
 
     def getMethod(self):
         return {"mpv": "Play by mpv"}
+
+    def getOptions(self):
+        return {"-gui=1",["GUI only option",
+                          "play in the embedded mpv gui"]}
 
     def mpvHeaderString(self,headers:dict):
         return "--http-header-fields=%s" % \
@@ -42,6 +47,20 @@ class MPV(BaseModule):
                                                                       self.mpvHeaderString(bs.headers),
                                                                       bs.url))
 
+    def playByEmbeddedMPV(self,source:CommonSource):
+        if self.running_mode != RunningMode.GUI:
+            return
+        bs = self.getPlayableSource(source.getBaseSources())
+        bs: BaseSource
+        if bs == None:
+            self.info("无法获取到可播放链接")
+        title = bs.filename
+        if len(bs.filename.split(".")) > 1:
+            title = ".".join(bs.filename.split(".")[:-1:])
+        self.info("playing {}".format(title))
+        mpvgui:MPVGUI = MPVGUI.getInstance()
+        mpvgui.play(bs.url,headers=bs.headers)
+
     def process(self, args):
         ops = OptionParser(args)
         if (len(ops.args) < 1):
@@ -55,7 +74,10 @@ class MPV(BaseModule):
             return
         s.load()
         if s.isValid():
-            self.playByMPV(s)
+            if (ops.getOption("gui") != None):
+                self.playByEmbeddedMPV(s)
+            else:
+                self.playByMPV(s)
         else:
             self.info("this url may not be available now")
 

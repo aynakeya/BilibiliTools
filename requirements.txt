@@ -2,6 +2,9 @@ certifi==2019.9.11
 chardet==3.0.4
 colorama==0.4.4
 idna==2.8
+iso8601==0.1.14
+m3u8==0.8.0
+mttkinter==0.6.1
 mutagen==1.43.0
 Pillow==7.1.2
 pyaria2==0.1.1

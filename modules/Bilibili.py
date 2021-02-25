@@ -1,7 +1,7 @@
 from downloaders import downloaders, BaseDownloader
 from sources import *
 
-from modules import BaseModule
+from modules import BaseModule, RunningMode
 from config import Config
 from utils.bilibili import QrLogin
 
@@ -115,7 +115,7 @@ class Login(BaseModule):
         return {"qrlogin":"get cookie using qrcode login"}
 
     def require(self):
-        if self.running_mode == "console":
+        if self.running_mode == RunningMode.CONSOLE:
             if not QrLogin.isLogin():
                 if input(
                         "We found that there is no sessdata included, would you like to login using qrcode y/n ?") == "y":

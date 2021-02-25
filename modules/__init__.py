@@ -3,8 +3,12 @@ from config import Config
 import glob,importlib
 modules = []
 
+class RunningMode():
+    CONSOLE = "console"
+    GUI = "gui"
+
 class BaseModule:
-    running_mode = "console"
+    running_mode = RunningMode.CONSOLE
     output_func = print
 
     def getMethod(self):

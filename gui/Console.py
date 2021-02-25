@@ -2,7 +2,7 @@ import tkinter as tk
 from tkinter import ttk, scrolledtext
 
 from config import Config
-from modules import modules as modulelist
+from modules import modules as modulelist, RunningMode
 from modules import BaseModule
 from typing import Dict
 from downloaders import downloaders as downloaderlist
@@ -31,7 +31,7 @@ class ConsoleGUI():
         self.gui.getTabController().add(self.widget, text="Conole")
 
         BaseModule.output_func = self._info
-        BaseModule.running_mode = "GUI"
+        BaseModule.running_mode = RunningMode.GUI
 
         for module in self.modules.values():
             module.prepare()
