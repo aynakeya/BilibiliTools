@@ -6,6 +6,7 @@ from modules import modules as modulelist, RunningMode
 from modules import BaseModule
 from typing import Dict
 from downloaders import downloaders as downloaderlist
+from utils.command import OutputParser
 
 
 class ConsoleGUI():
@@ -14,6 +15,8 @@ class ConsoleGUI():
     methods.update(dict((key, m) for m in modules.values() for key in m.getMethod().keys()))
     target_source_list = ["video", "audio", "text", "lyric", "cover", "danmu"]
     target_source_default = ["video"]
+
+    output_parser = OutputParser()
 
     def __init__(self, gui):
         self.gui: gui.GUI = gui
@@ -32,6 +35,8 @@ class ConsoleGUI():
 
         BaseModule.output_parser.output_func = self._info
         BaseModule.running_mode = RunningMode.GUI
+
+        self.output_parser.output_func = self._info
 
         for module in self.modules.values():
             module.prepare()
@@ -55,7 +60,9 @@ class ConsoleGUI():
         method_chosen['values'] = tuple(self.methods.keys())
         method_chosen \
             .grid(column=0, row=1, padx=8, pady=4)
-        method_chosen.current(list(self.methods.keys()).index("bdl"))
+
+        if (len(self.methods.keys()) > 0):
+            method_chosen.current(0)
 
         # Creating check box for commands
         ttk.Label(frame_basic, text="Enter a urls:") \
@@ -135,14 +142,17 @@ class ConsoleGUI():
                                                   args=self.args.get())
         if method == "help":
             for key, module in self.modules.items():
-                self._info("Module-{m_name}: ".format(m_name=key))
+                self.info("Module-{m_name}: ".format(m_name=key))
                 for m, desc in module.getMethod().items():
-                    self._info("%s: %s" % (m, desc), offset=3)
+                    self.info("%s: %s" % (m, desc), offset=3)
                 for m, desc in module.getOptions().items():
-                    self._info(m, offset=6)
-                    self._info(desc, offset=9)
+                    self.info(m, offset=6)
+                    self.info(desc, offset=9)
             return
         self.methods[method].process(command)
+
+    def info(self,msg,offset=0, step=3):
+        self.output_parser.print(msg,offset,step,prefix="BilibiliTools > ")
 
     def _clearOutput(self):
         self.output.config(state=tk.NORMAL)
@@ -152,6 +162,7 @@ class ConsoleGUI():
     def _info(self, msg):
         self.output.config(state=tk.NORMAL)
         self.output.insert("end", "%s\n" % msg)
+        self.output.see("end")
         self.output.config(state=tk.DISABLED)
         # if isinstance(msg, str):
         #     self.output.config(state=tk.NORMAL)

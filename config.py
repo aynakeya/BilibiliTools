@@ -1,5 +1,4 @@
-import glob
-import os
+import glob,json,os
 
 
 class ConfigFile:
@@ -31,6 +30,8 @@ class ConfigFile:
     defaultQuality = 120
 
     def __init__(self):
+        print("Loading config")
+        self._loadConfig()
         print("Cookie initialized")
         self.cookies = {}
         self.loadCookie()
@@ -56,5 +57,13 @@ class ConfigFile:
             return self.cookies[host]
         return self.cookies.get(host)
 
+    def _loadConfig(self,path="config.json"):
+        with open(path, "r", encoding="utf-8") as f:
+            data = json.loads(f.read())
+            for key,val in data.items():
+                if hasattr(self,key):
+                    self.__setattr__(key,val)
+
 
 Config = ConfigFile()
+Config._loadConfig()

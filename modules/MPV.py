@@ -1,12 +1,12 @@
-from gui.MPVGUI import MPVGUI
 from modules import BaseModule, RunningMode
 import subprocess
 
-from sources.base import BaseSource, SourceSelector, CommonSource
+from sources.base import BaseSource, SourceSelector
 from sources import *
 from sources.base.interface import WatchableSource
 from utils.command import OptionParser
 
+from gui.MPVGUI import MPVGUI
 
 class MPV(BaseModule):
     name = "MPV"

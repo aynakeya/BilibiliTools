@@ -6,10 +6,10 @@ import sys
 
 from utils.command import OutputParser
 
-outputP = OutputParser(prefix="BilibiliTools > ")
+outputP = OutputParser()
 
 def info(msg,offset=0,step=3):
-    outputP.print(msg,offset,step)
+    outputP.print(msg,offset,step,prefix="BilibiliTools > ")
 
 def infoParser(msg,offset,step):
     if isinstance(msg,str):

@@ -1,0 +1,29 @@
+{
+  "proxies": {
+    "http": "http://127.0.0.1:8888"
+  },
+  "useProxy": false,
+  "downloadProxy": false,
+  "commonHeaders": {
+    "user-agent": "Mozilla/5.0 (Windows NT 10.0; WOW64; rv:51.0) Gecko/20100101 Firefox/51.0"
+  },
+  "commonCookies": {},
+  "saveroute": "D://Download/bilidown",
+  "aria2rpc": "http://localhost:16800/rpc",
+  "aria2token": null,
+  "defaultDownloader": "aria2",
+  "useDownloader": {
+    "aria2": true,
+    "requests": true
+  },
+  "useModules": [
+    "Bilibili",
+    "Info",
+    "MPV",
+    "UniversalDownload",
+    "RealUrl",
+    "M3U8",
+    "Search"
+  ],
+  "defaultQuality" : 120
+}

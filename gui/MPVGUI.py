@@ -1,10 +1,7 @@
 from tkinter import ttk
 import tkinter as tk
 
-import gui
 from plugins import mpv_lib
-from sources import biliVideo, ImomoeSource
-
 
 class MPVGUI():
     MAX_VOLUME = 128
