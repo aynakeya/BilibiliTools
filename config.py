@@ -64,6 +64,14 @@ class ConfigFile:
                 if hasattr(self,key):
                     self.__setattr__(key,val)
 
+    def saveConfig(self,path="config.json"):
+        with open(path, "r", encoding="utf-8") as f:
+            data = json.loads(f.read())
+        with open(path, "w", encoding="utf-8") as f:
+            for key,val in data.items():
+                if hasattr(self,key):
+                    data[key] = self.__getattribute__(key)
+            f.write(json.dumps(data,indent=2))
+
 
 Config = ConfigFile()
-Config._loadConfig()
