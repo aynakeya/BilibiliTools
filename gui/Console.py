@@ -2,8 +2,8 @@ import tkinter as tk
 from tkinter import ttk, scrolledtext
 
 from config import Config
-from modules import modules as modulelist, RunningMode
-from modules import BaseModule
+from modules import modules as modulelist
+from modules.base import RunningMode, BaseModule
 from typing import Dict
 from downloaders import downloaders as downloaderlist
 from utils.command import OutputParser

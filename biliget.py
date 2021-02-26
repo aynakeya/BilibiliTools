@@ -1,7 +1,6 @@
 from typing import Dict, Any
-from functools import reduce
 from modules import modules as modulelist
-from modules import BaseModule
+from modules.base import BaseModule
 import sys
 
 from utils.command import OutputParser

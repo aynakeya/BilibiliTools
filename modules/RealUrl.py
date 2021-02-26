@@ -1,11 +1,10 @@
-from modules import BaseModule
-from config import Config
+from modules.base import BaseModule, registerModule
 from sources import *
 
 from sources.base import SourceSelector, BaseSource
 from utils.command import OptionParser
 
-
+@registerModule
 class RealUrl(BaseModule):
     name = "RealUrl"
     selector = SourceSelector(Wenku8TXT,

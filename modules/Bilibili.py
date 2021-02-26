@@ -1,14 +1,13 @@
 from downloaders import downloaders, BaseDownloader
 from sources import *
-
-from modules import BaseModule, RunningMode
+from modules.base import RunningMode, BaseModule, registerModule
 from config import Config
 from utils.bilibili import QrLogin
 
 from sources.base import SourceSelector, BaseSource
 from utils.command import OptionParser
 
-
+@registerModule
 class Download(BaseModule):
     name = "Bilibili.Download"
     selector = SourceSelector(biliVideo,
@@ -108,6 +107,7 @@ class Download(BaseModule):
                     s = val
                     s.download(d,Config.saveroute)
 
+@registerModule
 class Login(BaseModule):
     name = "Bilibili.Login"
 
@@ -137,6 +137,7 @@ class Login(BaseModule):
             else:
                 self.info("fail, please try again")
 
+@registerModule
 class VideoIdConverter(BaseModule):
     name = "Bilibili.VideoIdConverter"
 

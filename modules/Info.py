@@ -1,9 +1,9 @@
-from modules import BaseModule
+from modules.base import BaseModule, registerModule
 from sources.base import SourceSelector
 from sources import *
 from utils.command import OptionParser
 
-
+@registerModule
 class Info(BaseModule):
     name = "Info"
     selector = SourceSelector(biliLive,

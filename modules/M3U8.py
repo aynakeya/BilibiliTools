@@ -1,4 +1,4 @@
-from modules import BaseModule
+from modules.base import BaseModule, registerModule
 import os,subprocess
 
 from sources.base import BaseSource, SourceSelector, CommonSource
@@ -6,7 +6,7 @@ from sources import *
 from utils import formats
 from utils.command import OptionParser
 
-
+@registerModule
 class M3U8(BaseModule):
     name = "M3U8"
     selector = SourceSelector(biliLive,

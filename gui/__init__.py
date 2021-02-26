@@ -8,7 +8,7 @@ from gui.Config import ConfigGUI
 from gui.Console import ConsoleGUI
 from gui.Cookie import CookieGUI
 from gui.MPVGUI import MPVGUI
-from modules import BaseModule
+from modules.base import BaseModule
 from modules import modules as modulelist
 from sources import biliVideo
 

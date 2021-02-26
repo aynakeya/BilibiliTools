@@ -1,4 +1,4 @@
-from modules import BaseModule, RunningMode
+from modules.base import RunningMode, BaseModule, registerModule
 import subprocess
 
 from sources.base import BaseSource, SourceSelector
@@ -8,6 +8,7 @@ from utils.command import OptionParser
 
 from gui.MPVGUI import MPVGUI
 
+@registerModule
 class MPV(BaseModule):
     name = "MPV"
     selector = SourceSelector(biliLive,

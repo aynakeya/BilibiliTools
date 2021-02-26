@@ -1,4 +1,4 @@
-from modules import BaseModule
+from modules.base import BaseModule, registerModule
 from config import Config
 from downloaders import downloaders, BaseDownloader
 from sources import *
@@ -6,7 +6,7 @@ from sources import *
 from sources.base import SourceSelector, BaseSource
 from utils.command import OptionParser
 
-
+@registerModule
 class UniversalDownload(BaseModule):
     name = "UniversalDownload"
     selector = SourceSelector(Wenku8TXT,
