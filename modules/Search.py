@@ -7,7 +7,8 @@ from utils.command import OptionParser
 @registerModule
 class Search(BaseModule):
     name = "Search"
-    selector = SourceSelector(ImomoeSource)
+    selector = SourceSelector(ImomoeSource,
+                              biliAudio)
 
 
     def getMethod(self):
@@ -42,14 +43,15 @@ class Search(BaseModule):
                 self.info("Source name not support")
                 return
             search_sources = [s]
-        self.info(" -- Search Results -- ")
+        self.info(" -- Search Results For [{}]-- ".format(keyword))
         for search_source in search_sources:
             search_results:SearchResults = search_source.search(keyword,
                                                                 **kwargs)
-            if search_results == None:
+            if search_results == None or search_results.isEmpty():
                 continue
-            results = search_results.getResultsBy(base_source_name=target_source)
-
+            results = list(search_results.getResultsBy(base_source_name=target_source))
+            if len(results) == 0:
+                continue
             self.info(" -- Source:{} -- ".format(search_source.getSourceName()))
             for index,result in enumerate(results,start=1):
                 self.info("[{}]: ".format(index),prefix=False)
@@ -58,7 +60,7 @@ class Search(BaseModule):
                                                                                 sourcename = result.source_name,
                                                                                 base_source = result.base_source_name)
                           ,prefix=False)
-            self.info(" --  -- ")
+            self.info(" -- {cp}/{tp} -- ".format(cp=search_results.current_page,tp=search_results.total_page))
         self.info(" -- End Search Result-- ")
 
 exports = [Search]

@@ -1,8 +1,33 @@
+import traceback
 from typing import List
+from functools import wraps
 
+class CommonSourceWrapper():
+    @staticmethod
+    def handleException(func):
+        @wraps(func)
+        def wrapper(*args, **kwargs):
+            try:
+                return func(*args, **kwargs)
+            except Exception as e:
+                traceback.print_exc()
+                return None
+        return wrapper
+
+    @staticmethod
+    def handleExceptionNoReturn(func):
+        @wraps(func)
+        def wrapper(*args, **kwargs):
+            try:
+                return func(*args, **kwargs)
+            except Exception as e:
+                traceback.print_exc()
+                return None
+        return wrapper
 
 class CommonSource():
     name = None
+    wrapper = CommonSourceWrapper
 
     @classmethod
     def getSourceName(cls):
@@ -62,3 +87,4 @@ class SourceSelector():
 from .Media import MediaSource
 from .Picture import PictureSource
 from .Text import TextSource
+from .SearchResult import SearchResult,SearchResults

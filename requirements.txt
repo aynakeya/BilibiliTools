@@ -1,6 +1,10 @@
+beautifulsoup4==4.9.3
+bs4==0.0.1
 certifi==2019.9.11
 chardet==3.0.4
 colorama==0.4.4
+coloredlogs==15.0
+humanfriendly==9.1
 idna==2.8
 iso8601==0.1.14
 m3u8==0.8.0
@@ -8,8 +12,12 @@ mttkinter==0.6.1
 mutagen==1.43.0
 Pillow==7.1.2
 pyaria2==0.1.1
+pycryptodome==3.10.1
+pyncm==1.6.1
 pyparsing==2.4.7
+pyreadline==2.1
 qrcode==6.1
 requests==2.22.0
 six==1.15.0
+soupsieve==2.2
 urllib3==1.25.7

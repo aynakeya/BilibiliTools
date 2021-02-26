@@ -21,7 +21,7 @@ class SearchableSource(BaseInterface):
 
     @classmethod
     @abstractmethod
-    def search(cls, keywords,*args, **kwargs) -> SearchResults:
+    def search(cls, keyword,*args, **kwargs) -> SearchResults:
         pass
 
 class WatchableSource(BaseInterface):

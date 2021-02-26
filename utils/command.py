@@ -14,7 +14,7 @@ class OptionParser():
         if self.remove_first:
             rawlist = rawlist[1::]
         for seg in rawlist:
-            if len(seg) < 2:
+            if len(seg) < 1:
                 continue
             if seg[0] == "-":
                 opt = seg[1::].split("=")

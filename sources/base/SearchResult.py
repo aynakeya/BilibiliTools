@@ -21,6 +21,9 @@ class SearchResults(BaseSource):
         self.current_page = current_page
         self.total_page = total_page
 
+    def isEmpty(self) -> bool:
+        return len(self.results) == 0
+
     def getResultsBy(self,source_name=None,base_source_name=None):
         rs = self.results
         if source_name != None:

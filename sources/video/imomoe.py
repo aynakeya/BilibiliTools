@@ -1,6 +1,6 @@
 import traceback
 from config import Config
-from sources import MediaSource
+from sources import MediaSource, CommonSource
 from sources.base.SearchResult import SearchResult, SearchResults
 from sources.base.interface import SearchableSource
 from sources.video import VideoSource
@@ -26,29 +26,25 @@ class ImomoeSource(VideoSource, SearchableSource):
     search_api = "http://www.imomoe.ai/search.asp?searchword={keyword}&page={page}"
 
     @classmethod
+    @CommonSource.wrapper.handleException
     def search(cls, keyword, page=1, *args, **kwargs):
-        try:
-            url = cls.search_api.format(keyword=parse.quote(keyword,encoding="gb2312"),
-                                        page=page)
-            html_text = formats.htmlAutoDecode(httpGet(url).content)
-            pg = re.search(r"页次:[0-9]+/[0-9]+页", html_text)
-            if pg == None:
-                return None
-            pagenum = pg.group()[3:-1:].split("/")
-            cp, tp = int(pagenum[0]), int(pagenum[1])
-            soup = BeautifulSoup(html_text, "html.parser")
-            rs = []
-            for li in soup.find("div", {"class": "pics"}).find_all("li"):
-                rs.append(SearchResult(cls.base_url + li.a["href"][1::],
-                                       Config.commonHeaders,
-                                       li.h2.a["title"],
-                                       cls.getSourceName(),
-                                       "video"))
-            return SearchResults(rs,
-                                 cp, tp)
-        except Exception as e:
-            traceback.print_exc()
+        url = cls.search_api.format(keyword=parse.quote(keyword, encoding="gb2312"),
+                                    page=page)
+        html_text = formats.htmlAutoDecode(httpGet(url).content)
+        pg = re.search(r"页次:[0-9]+/[0-9]+页", html_text)
+        if pg == None:
             return None
+        pagenum = pg.group()[3:-1:].split("/")
+        cp, tp = int(pagenum[0]), int(pagenum[1])
+        soup = BeautifulSoup(html_text, "html.parser")
+        rs = []
+        for li in soup.find("div", {"class": "pics"}).find_all("li"):
+            rs.append(SearchResult(cls.base_url + li.a["href"][1::],
+                                   Config.commonHeaders,
+                                   li.h2.a["title"],
+                                   cls.getSourceName(),
+                                   "video"))
+        return SearchResults(rs, cp, tp)
 
     def __init__(self, id, source_id, ep_id):
         self.id = id
@@ -98,43 +94,38 @@ class ImomoeSource(VideoSource, SearchableSource):
         else:
             return {"video": self.getVideo(source_id=sid, ep_id=eid)}
 
+    @CommonSource.wrapper.handleException
     def getVideo(self, source_id: str = "-1", ep_id: str = "-1"):
         source_id, ep_id = str(source_id), str(ep_id)
         source_id = self.source_id if source_id == "-1" else source_id
         ep_id = self.ep_id if ep_id == "-1" else ep_id
-        try:
-            data = self.episodes[source_id][int(ep_id)]
-            player_html = httpGet(self.real_src_api.format(src=data["src"])).content.decode("utf-8")
-            real_url = re.search(
-                "varvideo='(.*)';", player_html.replace(" ", "")).group()[10:-2:]
-            return MediaSource(real_url, Config.commonHeaders,
-                               "{}-{}.{}".format(self.title,
-                                                 data["title"],
-                                                 file.getSuffixByUrl(real_url)))
-        except:
-            return None
+        data = self.episodes[source_id][int(ep_id)]
+        player_html = httpGet(self.real_src_api.format(src=data["src"])).content.decode("utf-8")
+        real_url = re.search(
+            "varvideo='(.*)';", player_html.replace(" ", "")).group()[10:-2:]
+        return MediaSource(real_url, Config.commonHeaders,
+                           "{}-{}.{}".format(self.title,
+                                             data["title"],
+                                             file.getSuffixByUrl(real_url)))
 
+    @CommonSource.wrapper.handleExceptionNoReturn
     def load(self, **kwargs):
-        try:
-            raw_html = httpGet(self.player_url.format(id=self.id_format
-                                                      .format(id=self.id, sid=self.source_id, ep_id=self.ep_id)))
-            if raw_html == None: return
-            html_text = formats.htmlAutoDecode(raw_html.content)
-            self.title = re.search(r"xTitle='(.*)'", html_text).group()[8:-1:]
-            playdata_url = re.search(r"src=\"/playdata/(.*)\"", html_text).group()[4:-1:]
-            playdata = formats.htmlAutoDecode(httpGet(self.base_url + playdata_url[1::]).content)
-            videolist = re.search(r"=\[(.*)\],", playdata).group()[1:-1:].replace("'", "\"")
-            for index, part in enumerate(json.loads(videolist)):
-                sid = str(index)
-                self.episodes[sid] = []
-                for url in part[1]:
-                    tmp = url.split("$")
-                    self.episodes[sid].append({"title": tmp[0],
-                                               "src": tmp[1],
-                                               "format": tmp[2]})
-        except Exception as e:
-            print(e)
-            pass
+        raw_html = httpGet(self.player_url.format(id=self.id_format
+                                                  .format(id=self.id, sid=self.source_id, ep_id=self.ep_id)))
+        if raw_html == None: return
+        html_text = formats.htmlAutoDecode(raw_html.content)
+        self.title = re.search(r"xTitle='(.*)'", html_text).group()[8:-1:]
+        playdata_url = re.search(r"src=\"/playdata/(.*)\"", html_text).group()[4:-1:]
+        playdata = formats.htmlAutoDecode(httpGet(self.base_url + playdata_url[1::]).content)
+        videolist = re.search(r"=\[(.*)\],", playdata).group()[1:-1:].replace("'", "\"")
+        for index, part in enumerate(json.loads(videolist)):
+            sid = str(index)
+            self.episodes[sid] = []
+            for url in part[1]:
+                tmp = url.split("$")
+                self.episodes[sid].append({"title": tmp[0],
+                                           "src": tmp[1],
+                                           "format": tmp[2]})
 
 # if __name__ == "__main__":
 #     a = ImomoeSource.search("dxd")

@@ -1,20 +1,46 @@
-from sources.base import MediaSource,PictureSource,TextSource
+from sources.base import MediaSource, PictureSource, TextSource, CommonSource,SearchResult,SearchResults
+from sources.base.interface import SearchableSource
 from utils.vhttp import httpGet
 from sources.bilibili import BilibiliSource
 from config import Config
 
 import re,random
 
-class biliAudio(BilibiliSource):
+class biliAudio(BilibiliSource,SearchableSource):
     name = "audio"
 
     pattern = r"au[0-9]+"
 
+    base_url = "https://www.bilibili.com/audio/"
+
     fileApi = "http://api.bilibili.com/audio/music-service-c/url?mid=8047632&mobi_app=iphone&platform=ios&privilege=2&quality=%s&songid=%s"
     infoApi = "https://www.bilibili.com/audio/music-service-c/web/song/info?sid=%s"
+
+    search_api = "https://api.bilibili.com/audio/music-service-c/s?search_type=music&keyword={keyword}&page={page}&pagesize={p_size}"
+
     headers = {"user-agent": "BilibiliClient/2.33.3",
                'Accept': "*/*",
                'Connection': "keep-alive"}
+
+    @classmethod
+    @CommonSource.wrapper.handleException
+    def search(cls, keyword, page=1,pagesize=5, **kwargs) -> SearchResults:
+        url = cls.search_api.format(keyword = keyword,
+                                    page = page,
+                                    p_size = pagesize)
+        data = httpGet(url).json()
+        cp,tp = data["data"]["page"],data["data"]["num_pages"]
+        rs = []
+        for r in data["data"]["result"]:
+            rs.append(SearchResult("{baseurl}au{id}".format(baseurl = cls.base_url,
+                                                            id = r["id"]),
+                                   cls.headers,
+                                   "{title} - {author} - {up}".format(title = r["title"],
+                                                                      author = r["author"],
+                                                                      up = r["up_name"]),
+                                   cls.getSourceName(),
+                                   "audio"))
+        return SearchResults(rs,cp,tp)
 
     def __init__(self, sid):
         self.sid = sid
@@ -76,18 +102,16 @@ class biliAudio(BilibiliSource):
         v.cover_url = cover_url
         return v
 
+    @CommonSource.wrapper.handleExceptionNoReturn
     def load(self,**kwargs):
         data = httpGet(self.infoApi % self.sid, headers=self.headers)
         if data == None:
             return
         data = data.json()
-        try:
-            self.title = data["data"]["title"]
-            self.uploader = data["data"]["author"]
-            self.lyric_url = data["data"]["lyric"]
-            self.cover_url = data["data"]["cover"]
-        except:
-            pass
+        self.title = data["data"]["title"]
+        self.uploader = data["data"]["author"]
+        self.lyric_url = data["data"]["lyric"]
+        self.cover_url = data["data"]["cover"]
 
     def _getQualities(self):
         quality = {}

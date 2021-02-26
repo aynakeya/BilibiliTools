@@ -2,9 +2,10 @@ from downloaders import downloaders, BaseDownloader
 from sources import *
 from modules.base import RunningMode, BaseModule, registerModule
 from config import Config
+from sources.base.interface import DownloadableSource
 from utils.bilibili import QrLogin
 
-from sources.base import SourceSelector, BaseSource
+from sources.base import SourceSelector
 from utils.command import OptionParser
 
 @registerModule
@@ -99,13 +100,13 @@ class Download(BaseModule):
                     d = self.availableDl.get("requests")
                 else:
                     d = downloader
-                s: BaseSource
                 if isinstance(val,list):
                     for s in val:
-                        s.download(d,Config.saveroute)
+                        if isinstance(s,DownloadableSource):
+                            s.download(d,Config.saveroute)
                 else:
-                    s = val
-                    s.download(d,Config.saveroute)
+                    if isinstance(val, DownloadableSource):
+                        val.download(d,Config.saveroute)
 
 @registerModule
 class Login(BaseModule):
