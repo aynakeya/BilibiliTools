@@ -22,6 +22,7 @@ Require --add-data "modules;modules" parameter in pyinstaller
 #         importlib.import_module("modules." + name)
 
 
+# decrypted
 # for f in glob.glob(join(getcwd(),"modules", "*.py")):
 #     name = basename(f)[:-3:]
 #     if isfile(f) and not f.endswith('__init__.py') and name in Config.useModules:

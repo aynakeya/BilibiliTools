@@ -49,6 +49,17 @@ biliget 会读取需要加载的module, module里使用SourceSelector选择对�
 *被pilipili退回了。*
 
 ---
+
+### biliget-gui.py
+
+**gui 版本的聚合下载器**
+
+同上
+
+需要mpv-1.dll，放在当前目录下就行。
+
+---
+
 ### JSCripts
 
 **js脚本**
@@ -91,3 +102,5 @@ pyinstaller --windowed --add-data "config.json;." --add-data "cookies;cookies" -
 2019/11/20: 开始重写
 
 2020/06/10: 重写完成
+
+2021/2/26: 重写完成
