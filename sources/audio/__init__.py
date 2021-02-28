@@ -8,5 +8,10 @@ class AudioSource(CommonSource):
     def getSourceName(cls):
         return "audio.%s" % cls.name
 
+    @property
+    def audio(self):
+        return None
+
+
     def isValid(self):
         return False

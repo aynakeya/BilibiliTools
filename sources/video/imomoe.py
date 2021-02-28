@@ -1,4 +1,6 @@
 import traceback
+
+from apis import RegExpResponseContainer
 from config import Config
 from sources import MediaSource, CommonSource
 from sources.base.SearchResult import SearchResult, SearchResults
@@ -7,29 +9,25 @@ from sources.video import VideoSource
 from utils import file, formats
 from bs4 import BeautifulSoup
 from urllib import parse
+import apis.imomoe as imomoeApi
 import re, json
 
 from utils.vhttp import httpGet
 
 
 class ImomoeSource(VideoSource, SearchableSource):
-    name = "imomoe"
+    __source_name__ = "imomoe"
 
     base_url = "http://www.imomoe.ai/"
-    player_url = "http://www.imomoe.ai/player/{id}.html"
-    real_src_api = "https://api.xiaomingming.org/cloud/mp6.php?vid={src}"
-    id_format = "{id}-{sid}-{ep_id}"
 
     patternA = r"imomoe\.ai\/player\/(.*)\.html"
     patternB = r"imomoe\.ai\/view\/(.*)\.html"
 
-    search_api = "http://www.imomoe.ai/search.asp?searchword={keyword}&page={page}"
-
     @classmethod
     @CommonSource.wrapper.handleException
     def search(cls, keyword, page=1, *args, **kwargs):
-        url = cls.search_api.format(keyword=parse.quote(keyword, encoding="gb2312"),
-                                    page=page)
+        # todo: container for beautifulsoup?
+        url = imomoeApi.API.search_api(keyword,page)
         html_text = formats.htmlAutoDecode(httpGet(url).content)
         pg = re.search(r"页次:[0-9]+/[0-9]+页", html_text)
         if pg == None:
@@ -42,6 +40,7 @@ class ImomoeSource(VideoSource, SearchableSource):
             rs.append(SearchResult(cls.base_url + li.a["href"][1::],
                                    Config.commonHeaders,
                                    li.h2.a["title"],
+                                   cls.initFromUrl(cls.base_url + li.a["href"][1::]),
                                    cls.getSourceName(),
                                    "video"))
         return SearchResults(rs, cp, tp)
@@ -72,7 +71,7 @@ class ImomoeSource(VideoSource, SearchableSource):
 
     @property
     def info(self):
-        return {"Type": self.name,
+        return {"Type": self.getSourceName(),
                 "Title": self.title,
                 "Episode Title": self.episodes[self.source_id][int(self.ep_id)]["title"],
                 "Available Source":",".join(self.episodes.keys()),
@@ -100,25 +99,31 @@ class ImomoeSource(VideoSource, SearchableSource):
         source_id = self.source_id if source_id == "-1" else source_id
         ep_id = self.ep_id if ep_id == "-1" else ep_id
         data = self.episodes[source_id][int(ep_id)]
-        player_html = httpGet(self.real_src_api.format(src=data["src"])).content.decode("utf-8")
-        real_url = re.search(
-            "varvideo='(.*)';", player_html.replace(" ", "")).group()[10:-2:]
+        container = RegExpResponseContainer(imomoeApi.resolveVideoUrl(data["src"]),
+                                            real_url=("varvideo='(.*)';",
+                                                   lambda x: x[10:-2:]),
+                                            strip=" ")
+        real_url = container.data["real_url"]
         return MediaSource(real_url, Config.commonHeaders,
                            "{}-{}.{}".format(self.title,
                                              data["title"],
                                              file.getSuffixByUrl(real_url)))
 
-    @CommonSource.wrapper.handleExceptionNoReturn
+    @CommonSource.wrapper.handleException
     def load(self, **kwargs):
-        raw_html = httpGet(self.player_url.format(id=self.id_format
-                                                  .format(id=self.id, sid=self.source_id, ep_id=self.ep_id)))
-        if raw_html == None: return
-        html_text = formats.htmlAutoDecode(raw_html.content)
-        self.title = re.search(r"xTitle='(.*)'", html_text).group()[8:-1:]
-        playdata_url = re.search(r"src=\"/playdata/(.*)\"", html_text).group()[4:-1:]
-        playdata = formats.htmlAutoDecode(httpGet(self.base_url + playdata_url[1::]).content)
-        videolist = re.search(r"=\[(.*)\],", playdata).group()[1:-1:].replace("'", "\"")
-        for index, part in enumerate(json.loads(videolist)):
+        container = RegExpResponseContainer(imomoeApi.getVideoInfo(self.id,
+                                                                   self.source_id,
+                                                                   self.ep_id),
+                                            title = (r"xTitle='(.*)'",
+                                                     lambda x:x[8:-1:]),
+                                            playdata_url= (r"src=\"/playdata/(.*)\"",
+                                                     lambda x:x[5:-1:]))
+        self.title = container.data["title"]
+        playdata_url = container.data["playdata_url"]
+        playdata = RegExpResponseContainer(imomoeApi.getPlaydata(playdata_url),
+                                            videolist = (r"=\[(.*)\],",
+                                                     lambda x:x[1:-1:]))
+        for index, part in enumerate(json.loads(playdata.data["videolist"].replace("'", "\""))):
             sid = str(index)
             self.episodes[sid] = []
             for url in part[1]:

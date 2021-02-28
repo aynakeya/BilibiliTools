@@ -2,11 +2,11 @@ from sources.base import CommonSource
 
 
 class BilibiliSource(CommonSource):
-    name = "base"
+    __source_name__ = "base"
 
     @classmethod
     def getSourceName(cls):
-        return "bilibili.%s" % cls.name
+        return "bilibili.%s" % cls.__source_name__
 
     @property
     def id(self):

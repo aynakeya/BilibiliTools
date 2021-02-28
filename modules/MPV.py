@@ -16,7 +16,8 @@ class MPV(BaseModule):
                               biliBangumi,
                               biliAudio,
                               ImomoeSource,
-                              KakadmSource)
+                              KakadmSource,
+                              NeteaseMusicSource)
 
     def getMethod(self):
         return {"mpv": "Play by mpv"}
@@ -40,6 +41,7 @@ class MPV(BaseModule):
     def playByMPV(self,bs:BaseSource):
         if bs == None:
             self.info("无法获取到可播放链接")
+            return
         title = bs.filename
         if len(bs.filename.split(".")) >1:
             title = ".".join(bs.filename.split(".")[:-1:])
@@ -53,6 +55,7 @@ class MPV(BaseModule):
             return
         if bs == None:
             self.info("无法获取到可播放链接")
+            return
         title = bs.filename
         if len(bs.filename.split(".")) > 1:
             title = ".".join(bs.filename.split(".")[:-1:])

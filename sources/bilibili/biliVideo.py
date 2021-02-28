@@ -7,7 +7,7 @@ import re, json
 
 
 class biliVideo(BilibiliSource):
-    name = "video"
+    __source_name__ = "video"
 
     patternAv = r"av[0-9]+"
     patternBv = r"BV[0-9,A-Z,a-z]+"
@@ -120,7 +120,7 @@ class biliVideo(BilibiliSource):
     @property
     def info(self):
         qs = ["%s: %s(%s)" % (key, value[1], value[0])for key, value in self._getQualities().items()]
-        return {"Type": self.name,
+        return {"Type": self.getSourceName(),
                 "Title": self.title,
                 "Bid": self.bid,
                 "Cid": str(self._getPageCid(self.currentPage)),
@@ -234,7 +234,7 @@ class biliVideo(BilibiliSource):
 
 
 class biliBangumi(biliVideo):
-    name = "bangumi"
+    __source_name__ = "bangumi"
 
     patterns = [r"ep[0-9]+",
                 r"ss[0-9]+"]
@@ -248,7 +248,7 @@ class biliBangumi(biliVideo):
     @property
     def info(self):
         qs = ["%s : %s(%s)" % (key, value[1], value[0]) for key, value in self._getQualities().items()]
-        return {"Type": self.name,
+        return {"Type": self.getSourceName(),
                 "Title": self.title,
                 "Bid": self.bid,
                 "Cid": str(self._getPageCid(self.currentPage)),

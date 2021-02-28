@@ -1,22 +1,19 @@
+from apis import JsonResponseContainer
 from sources.base import MediaSource, PictureSource, TextSource, CommonSource,SearchResult,SearchResults
 from sources.base.interface import SearchableSource
 from utils.vhttp import httpGet
 from sources.bilibili import BilibiliSource
 from config import Config
-
+import apis.bilibili.audio as baudioApi
+import apis.bilibili.audiolist as balApi
 import re,random
 
 class biliAudio(BilibiliSource,SearchableSource):
-    name = "audio"
+    __source_name__ = "audio"
 
     pattern = r"au[0-9]+"
 
     base_url = "https://www.bilibili.com/audio/"
-
-    fileApi = "http://api.bilibili.com/audio/music-service-c/url?mid=8047632&mobi_app=iphone&platform=ios&privilege=2&quality=%s&songid=%s"
-    infoApi = "https://www.bilibili.com/audio/music-service-c/web/song/info?sid=%s"
-
-    search_api = "https://api.bilibili.com/audio/music-service-c/s?search_type=music&keyword={keyword}&page={page}&pagesize={p_size}"
 
     headers = {"user-agent": "BilibiliClient/2.33.3",
                'Accept': "*/*",
@@ -25,19 +22,28 @@ class biliAudio(BilibiliSource,SearchableSource):
     @classmethod
     @CommonSource.wrapper.handleException
     def search(cls, keyword, page=1,pagesize=5, **kwargs) -> SearchResults:
-        url = cls.search_api.format(keyword = keyword,
-                                    page = page,
-                                    p_size = pagesize)
-        data = httpGet(url).json()
-        cp,tp = data["data"]["page"],data["data"]["num_pages"]
+
+        container = JsonResponseContainer(baudioApi.getSearchResult(keyword,
+                                                                    page= page,
+                                                                    pagesize=pagesize),
+                                          currentpage = "data.page",
+                                          totalpage = "data.num_pages",
+                                          result = "data.result")
+        cp,tp,result = container.data["currentpage"],container.data["totalpage"],container.data["result"]
         rs = []
-        for r in data["data"]["result"]:
+        for r in result:
+            bas = cls(r["id"])
+            bas.title = r["title"]
+            bas.author =r["author"]
+            bas.uploader = r["up_name"]
+            bas.cover_url = r["cover"]
             rs.append(SearchResult("{baseurl}au{id}".format(baseurl = cls.base_url,
                                                             id = r["id"]),
                                    cls.headers,
                                    "{title} - {author} - {up}".format(title = r["title"],
                                                                       author = r["author"],
                                                                       up = r["up_name"]),
+                                   bas,
                                    cls.getSourceName(),
                                    "audio"))
         return SearchResults(rs,cp,tp)
@@ -45,6 +51,7 @@ class biliAudio(BilibiliSource,SearchableSource):
     def __init__(self, sid):
         self.sid = sid
         self.title = ""
+        self.author = ""
         self.uploader = ""
         self.lyric_url = ""
         self.cover_url = ""
@@ -57,6 +64,7 @@ class biliAudio(BilibiliSource,SearchableSource):
     def audio(self):
         return self.getAudio()
 
+    @CommonSource.wrapper.handleException
     def getAudio(self,qn=2):
         cdns = self._getCdns(quality=qn)
         if len(cdns) != 0:
@@ -79,7 +87,7 @@ class biliAudio(BilibiliSource,SearchableSource):
     @property
     def info(self):
         qs = ["%s: %s(%s %s)" % (key,value[2],value[0],value[1]) for key,value in self._getQualities().items()]
-        return {"Type":self.name,
+        return {"Type":self.getSourceName(),
                 "Title":self.title,
                 "Uploader":self.uploader,
                 "Available Qualities":qs}
@@ -102,30 +110,32 @@ class biliAudio(BilibiliSource,SearchableSource):
         v.cover_url = cover_url
         return v
 
-    @CommonSource.wrapper.handleExceptionNoReturn
+    @CommonSource.wrapper.handleException
     def load(self,**kwargs):
-        data = httpGet(self.infoApi % self.sid, headers=self.headers)
-        if data == None:
-            return
-        data = data.json()
-        self.title = data["data"]["title"]
-        self.uploader = data["data"]["author"]
-        self.lyric_url = data["data"]["lyric"]
-        self.cover_url = data["data"]["cover"]
+        container = JsonResponseContainer(baudioApi.getAudioInfo(self.sid),
+                                          title = "data.title",
+                                          uploader = "data.uname",
+                                          author = "data.author",
+                                          lyric = "data.lyric",
+                                          cover = "data.cover")
+        self.title = container.data["title"]
+        self.uploader = container.data["uploader"]
+        self.author = container.data["author"]
+        self.lyric_url = container.data["lyric"]
+        self.cover_url = container.data["cover"]
 
     def _getQualities(self):
         quality = {}
-        data = httpGet(self.fileApi % ("2", self.sid), headers=self.headers)
-        if data == None:
-            return quality
-        data = data.json()
-        for q in data["data"]["qualities"]:
+        container = JsonResponseContainer(baudioApi.getAudioFile(self.sid, quality=quality),
+                                          qualities="data.cdns")
+        for q in container.data["qualities"]:
            quality[q["type"]] = (q["tag"], q["bps"] ,q["desc"])
         return quality
 
     def _getCdns(self, quality=2):
-        data = httpGet(self.fileApi % (quality, self.sid), headers=self.headers)
-        return [] if data==None else data.json()["data"]["cdns"]
+        container = JsonResponseContainer(baudioApi.getAudioFile(self.sid,quality=quality),
+                                          cdns = "data.cdns")
+        return container.data["cdns"]
 
     def getBaseSources(self,qn=2,**kwargs):
         if not self.isValid(): return {}
@@ -137,10 +147,9 @@ class biliAudio(BilibiliSource,SearchableSource):
         return True if self.title != "" else False
 
 class biliAudioList(BilibiliSource):
-    name = "audiolist"
+    __source_name__ = "audiolist"
 
     pattern = r"am[0-9]+"
-    infoApi = "https://www.bilibili.com/audio/music-service-c/web/song/of-menu?ps=100&sid=%s&pn=%s"
 
 
     def __init__(self, sid):
@@ -153,7 +162,7 @@ class biliAudioList(BilibiliSource):
 
     @property
     def info(self):
-        return {"Type": self.name,
+        return {"Type": self.getSourceName(),
                 "Audio number": len(self.audios)}
 
     @classmethod
@@ -165,15 +174,18 @@ class biliAudioList(BilibiliSource):
         pattern = "am[0-9]+"
         return cls(re.search(pattern, url).group()[2::]) if re.search(pattern, url) != None else cls("")
 
+    @CommonSource.wrapper.handleException
     def load(self,maxNum=1000,**kwargs):
         self.audios.clear()
         num = 0
         pn = 1
         while True:
-            data = httpGet(self.infoApi % (self.sid, pn), headers = Config.commonHeaders)
-            if data == None: return
-            data = data.json()
-            for audio in data["data"]["data"]:
+            container = JsonResponseContainer(balApi.getAudioListInfo(self.sid,
+                                                                      page = pn),
+                                              data = "data.data",
+                                              curpage = "data.curPage",
+                                              totalpage = "data.pageCount")
+            for audio in container.data["data"]:
                 if num >= maxNum: return
                 self.audios.append(biliAudio.initFromData(audio["id"],
                                                           audio["title"],
@@ -181,7 +193,7 @@ class biliAudioList(BilibiliSource):
                                                           audio["lyric"],
                                                           audio["cover"]))
                 num +=1
-            if data["data"]["pageCount"] == data["data"]["curPage"]:
+            if container.data["curpage"] == container.data["totalpage"]:
                 break
             pn += 1
 

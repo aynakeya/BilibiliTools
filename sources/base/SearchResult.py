@@ -4,12 +4,13 @@ from sources.base import BaseSource
 
 
 class SearchResult(BaseSource):
-    name = "search-result"
+    __source_name__ = "search-result"
 
-    def __init__(self, url, headers, filename,source_name,base_source_name):
+    def __init__(self, url, headers, filename,source,source_name,base_source_name):
         self.url = url
         self.headers = headers
         self.filename = filename
+        self.source = source
         self.source_name = source_name
         self.base_source_name = base_source_name
 

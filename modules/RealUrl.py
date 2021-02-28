@@ -10,7 +10,9 @@ class RealUrl(BaseModule):
     selector = SourceSelector(Wenku8TXT,
                               KakadmSource,
                               ImomoeSource,
-                              biliLive)
+                              biliLive,
+                              biliAudio,
+                              NeteaseMusicSource)
 
     def __init__(self):
         pass
@@ -21,9 +23,9 @@ class RealUrl(BaseModule):
 
     def getOptions(self):
         return {
-            "-{source name}": ["download the source by name",
+            "-{source name}": ["get source by name",
                    "Available source name: ",
-                   ["· text","· video"]],
+                   ["· text","· video", "· àudio"]],
         }
 
     def process(self, args):

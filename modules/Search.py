@@ -8,7 +8,8 @@ from utils.command import OptionParser
 class Search(BaseModule):
     name = "Search"
     selector = SourceSelector(ImomoeSource,
-                              biliAudio)
+                              biliAudio,
+                              NeteaseMusicSource)
 
 
     def getMethod(self):

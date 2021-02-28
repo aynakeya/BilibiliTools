@@ -1,3 +1,6 @@
+from typing import Iterable
+
+
 class OptionParser():
     def __init__(self, raw, first=False):
         raw: str
@@ -49,6 +52,8 @@ class OutputParser():
         self.output_func = output_func
 
     def print(self, msg, offset, step, prefix=""):
+        # if not isinstance(msg, Iterable):
+        #     msg = str(msg)
         if isinstance(msg, str):
             self.output_func("{prefix}{msg}".format(prefix=prefix,
                                                     msg=self._parseOffset(msg,

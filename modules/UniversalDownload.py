@@ -1,5 +1,4 @@
 from modules.base import BaseModule, registerModule
-from config import Config
 from downloaders import downloaders, BaseDownloader
 from sources import *
 
@@ -11,7 +10,8 @@ class UniversalDownload(BaseModule):
     name = "UniversalDownload"
     selector = SourceSelector(Wenku8TXT,
                               KakadmSource,
-                              ImomoeSource)
+                              ImomoeSource,
+                              NeteaseMusicSource)
 
     def __init__(self):
         self.availableDl = {}

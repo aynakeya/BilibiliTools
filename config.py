@@ -1,5 +1,7 @@
 import glob,json,os
 
+from utils import vwrappers
+
 
 class ConfigFile:
     proxies = {"http": "http://127.0.0.1:8888"}
@@ -57,6 +59,7 @@ class ConfigFile:
             return self.cookies[host]
         return self.cookies.get(host)
 
+    @vwrappers.TryExceptRetNone
     def _loadConfig(self,path="config.json"):
         with open(path, "r", encoding="utf-8") as f:
             data = json.loads(f.read())

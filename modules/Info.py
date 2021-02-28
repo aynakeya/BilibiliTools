@@ -1,3 +1,5 @@
+from typing import Iterable
+
 from modules.base import BaseModule, registerModule
 from sources.base import SourceSelector
 from sources import *
@@ -13,7 +15,8 @@ class Info(BaseModule):
                               biliBangumi,
                               Wenku8TXT,
                               ImomoeSource,
-                              KakadmSource)
+                              KakadmSource,
+                              NeteaseMusicSource)
 
     def getMethod(self):
         return {"info": "Print out basic information."}
@@ -30,6 +33,8 @@ class Info(BaseModule):
             if s.isValid():
                 self.info("--")
                 for key, value in s.info.items():
+                    if not isinstance(value, Iterable):
+                        value = str(value)
                     if isinstance(value,str):
                         self.info("%s: %s" % (key,value),prefix=False)
                     else:

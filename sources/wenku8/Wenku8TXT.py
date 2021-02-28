@@ -1,16 +1,13 @@
-import json
-
+from apis import RegExpResponseContainer
+import apis.wenku8 as wenku8api
 from config import Config
-from downloaders import requestsDownloader
-from sources import TextSource
+from sources import TextSource, CommonSource
 from sources.wenku8 import Wenku8Source
 import re
 
-from utils.vhttp import httpGet
-
 
 class Wenku8TXT(Wenku8Source):
-    name = "txt"
+    __source_name__ = "txt"
 
     baseUrl = "https://www.wenku8.net/book/{id}.htm"
 
@@ -26,17 +23,18 @@ class Wenku8TXT(Wenku8Source):
 
     @property
     def id(self):
-        return id
+        return self.bid
 
     @property
     def info(self):
-        return {"Type": self.getSourceName,
+        return {"Type": self.getSourceName(),
                 "Title": self.title,
+                "Book ID": self.bid,
                 "Author": self.author,
                 "Publisher": self.publisher}
     @property
     def txt(self):
-        return TextSource(self.download_api.format(id=self.bid),
+        return TextSource(self.download_api.format(id=wenku8api.getFileUrl(self.bid)),
                           Config.commonHeaders,
                           self.getParsedTitle()+".txt","")
 
@@ -55,20 +53,16 @@ class Wenku8TXT(Wenku8Source):
     def getBaseSources(self):
         return {"text":self.txt}
 
+    @CommonSource.wrapper.handleException
     def load(self):
         if self.bid == "": return
-        rawhtml = httpGet(self.baseUrl.format(id = self.bid),
-                          headers = Config.commonHeaders)
-        if rawhtml == None:return
-        try:
-            rawhtml = rawhtml.content.decode("gbk")
-            title = re.search(r"<title>(.*)</title>", rawhtml).group()[7:-7:].split(" - ")
-            self.title = title[0]
-            self.publisher =title[2]
-            self.author = title[1]
-        except Exception as e:
-            print(repr(e))
-            pass
+        container = RegExpResponseContainer(wenku8api.getBookInfo(self.bid),
+                                            info=(r"<title>(.*)</title>",
+                                                  lambda x: x[7:-8:]))
+        title = container.data["info"].split(" - ")
+        self.publisher = title[2]
+        self.author = title[1]
+        self.title = title[0]
 
     def getParsedTitle(self):
         return "{} - {}".format(self.title,self.author)

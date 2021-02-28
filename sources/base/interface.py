@@ -1,4 +1,4 @@
-from abc import ABCMeta,abstractmethod,abstractproperty
+from abc import ABCMeta, abstractmethod, abstractproperty
 from typing import Dict
 
 from sources.base.SearchResult import SearchResults
@@ -6,6 +6,7 @@ from sources.base.SearchResult import SearchResults
 
 class BaseInterface(metaclass=ABCMeta):
     pass
+
 
 class DownloadableSource(BaseInterface):
     @abstractmethod
@@ -15,14 +16,15 @@ class DownloadableSource(BaseInterface):
     @property
     @abstractmethod
     def suffix(self):
-        pass
+        return ""
+
 
 class SearchableSource(BaseInterface):
-
     @classmethod
     @abstractmethod
-    def search(cls, keyword,*args, **kwargs) -> SearchResults:
+    def search(cls, keyword, *args, **kwargs) -> SearchResults:
         pass
+
 
 class WatchableSource(BaseInterface):
     pass

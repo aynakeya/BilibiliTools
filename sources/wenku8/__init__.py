@@ -2,11 +2,11 @@ from sources.base import CommonSource
 
 
 class Wenku8Source(CommonSource):
-    name = "base"
+    __source_name__ = "base"
 
     @classmethod
     def getSourceName(cls):
-        return "wenku8.%s" % cls.name
+        return "wenku8.%s" % cls.__source_name__
 
     @property
     def id(self):

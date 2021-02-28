@@ -1,12 +1,14 @@
-from sources.base import MediaSource
+from apis import JsonResponseContainer, RegExpResponseContainer
+from sources.base import MediaSource, CommonSource
 from utils.vhttp import httpGet
 from config import Config
 from sources.bilibili import BilibiliSource
+from apis.bilibili import live as liveApi
 import re
 
 
 class biliLive(BilibiliSource):
-    name = "live"
+    __source_name__ = "live"
 
     patternUrl = r"live\.bilibili\.com\/[0-9]+"
     patternId = r"live[0-9]+"
@@ -24,8 +26,22 @@ class biliLive(BilibiliSource):
         return self.rid
 
     @property
+    def video(self):
+        return self.getVideo()
+
+    @CommonSource.wrapper.handleException
+    def getVideo(self, format="hls"):
+        container = JsonResponseContainer(liveApi.getRealUrlByFormat(self.room_id,
+                                                                     format),
+                                          durl="data.durl")
+        return MediaSource(container.data["durl"][-1]['url'],
+                           {"origin": "www.bilibili.com", "referer": self.baseUrl % self.id,
+                            "user-agent": Config.commonHeaders["user-agent"]},
+                           self.title)
+
+    @property
     def info(self):
-        return {"Type": self.name,
+        return {"Type": self.getSourceName(),
                 "Title": self.title,
                 "Room ID": self.rid,
                 "Real Room ID": self.room_id,
@@ -38,18 +54,19 @@ class biliLive(BilibiliSource):
     def isValid(self):
         return self.room_id != ""
 
-    def load(self):
-        r_url = 'https://api.live.bilibili.com/room/v1/Room/room_init?id={}'.format(self.rid)
-        res = httpGet(r_url).json()
-        if res["code"] == 0:
-            if res['data']['live_status'] == 1:
-                self.room_id = res['data']['room_id']
-        tp = r"<title id=\"link-app-title\">.*<\/title>"
-        res = httpGet(self.baseUrl%self.rid,
+    @CommonSource.wrapper.handleException
+    def load(self,**kwargs):
+        container = JsonResponseContainer(liveApi.getLiveInfo(self.rid),
+                                          live_stauts="data.live_status",
+                                          room_id="data.room_id")
+        if container.data["live_stauts"] == 1:
+            self.room_id = container.data["room_id"]
+        res = httpGet(self.baseUrl % self.rid,
                       headers={"origin": "www.bilibili.com", "referer": self.baseUrl % self.id,
                                "user-agent": Config.commonHeaders["user-agent"]}
                       ).content.decode("utf-8")
-        if re.search(tp,res):
+        tp = r"<title id=\"link-app-title\">.*<\/title>"
+        if re.search(tp, res):
             self.title = re.search(tp, res).group()[27:-8:]
 
     @classmethod
@@ -60,28 +77,7 @@ class biliLive(BilibiliSource):
             return cls(re.search(cls.patternId, url).group()[4::])
         return cls("")
 
-    def _getRealUrlByPlatform(self,pf):
-        f_url = 'https://api.live.bilibili.com/xlive/web-room/v1/playUrl/playUrl'
-        params = {
-            'cid': self.room_id,
-            'qn': 10000,
-            'platform': pf,
-            'https_url_req': 1,
-            'ptype': 16
-        }
-        resp = httpGet(f_url, params=params).json()
-        try:
-            durl = resp['data']['durl']
-            real_url = durl[-1]['url']
-            return real_url
-        except:
-            return None
-
-    def getBaseSources(self,format="hls"):
-        fmts = {"hls": "h5", "flv": "web"}
+    def getBaseSources(self, format="hls",**kwargs):
         if self.isValid():
-            return {"video":MediaSource(self._getRealUrlByPlatform(fmts[format]),
-                               {"origin": "www.bilibili.com", "referer": self.baseUrl % self.id,
-                                        "user-agent": Config.commonHeaders["user-agent"]},
-                               self.title)}
+            return {"video": self.getVideo(format=format)}
         return {}

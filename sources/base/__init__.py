@@ -14,24 +14,13 @@ class CommonSourceWrapper():
                 return None
         return wrapper
 
-    @staticmethod
-    def handleExceptionNoReturn(func):
-        @wraps(func)
-        def wrapper(*args, **kwargs):
-            try:
-                return func(*args, **kwargs)
-            except Exception as e:
-                traceback.print_exc()
-                return None
-        return wrapper
-
 class CommonSource():
-    name = None
+    __source_name__ = None
     wrapper = CommonSourceWrapper
 
     @classmethod
     def getSourceName(cls):
-        return cls.name
+        return cls.__source_name__
 
     @classmethod
     def initFromUrl(cls,url):
@@ -41,10 +30,11 @@ class CommonSource():
     def info(self):
         return {}
 
-    def getBaseSources(self):
+    def getBaseSources(self,*args,**kwargs):
         return {}
 
-    def load(self):
+    @CommonSourceWrapper.handleException
+    def load(self,*args,**kwargs):
         pass
 
     @classmethod
@@ -52,7 +42,7 @@ class CommonSource():
         return False
 
 class BaseSource():
-    name = None
+    __source_name__ = None
 
     def __init__(self):
         self.url = ""
@@ -61,7 +51,7 @@ class BaseSource():
 
     @classmethod
     def getSourceName(cls):
-        return "base.%s" % cls.name
+        return "base.%s" % cls.__source_name__
 
 class SourceSelector():
     def __init__(self,*args):

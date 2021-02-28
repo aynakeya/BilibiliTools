@@ -6,7 +6,7 @@ from sources.base import BaseSource
 
 
 class TextSource(BaseSource,DownloadableSource):
-    name = "text"
+    __source_name__ = "text"
 
     def __init__(self, url, headers, filename,filecontent):
         self.url = url

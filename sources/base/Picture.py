@@ -7,7 +7,7 @@ from sources.base import BaseSource
 
 
 class PictureSource(BaseSource,DownloadableSource):
-    name = "picture"
+    __source_name__ = "picture"
 
     def __init__(self, url, headers, filename,filecontent):
         self.url = url

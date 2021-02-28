@@ -5,7 +5,7 @@ from utils import formats,file
 import os
 
 class MediaSource(BaseSource,DownloadableSource,WatchableSource):
-    name = "media"
+    __source_name__ = "media"
 
     def __init__(self,url,headers,filename):
         self.url = url
