@@ -1,4 +1,4 @@
-from utils.vhttp import httpGet, httpPost
+from utils.vhttp import httpGet
 from config import Config
 
 

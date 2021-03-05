@@ -1,11 +1,15 @@
 from functools import wraps
 from typing import List
 
-from utils import vhttp, vwrappers, formats
+from utils import vhttp, formats
 import json,re
 
 HTTP_CLIENT = vhttp.HttpClient()
 
+class SETTING:
+    common_header = {
+        "user-agent": "Mozilla/5.0 (Windows NT 10.0; WOW64; rv:51.0) Gecko/20100101 Firefox/51.0"
+    }
 
 class RequestMethod:
     GET = "get"

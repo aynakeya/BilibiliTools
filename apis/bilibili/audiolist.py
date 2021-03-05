@@ -1,12 +1,7 @@
-from apis import CommonRequestWrapper, RegExpResponseContainer
-from config import Config
-from urllib import parse
+from apis import CommonRequestWrapper, SETTING
 
 
 class API:
-    headers = {"user-agent": "BilibiliClient/2.33.3",
-               'Accept': "*/*",
-               'Connection': "keep-alive"}
 
     @staticmethod
     def info_api(id,page,pagesize):
@@ -35,5 +30,5 @@ def getAudioListInfo(songlist_id:str,page:int=1,pagesize:int=100):
     """
     return ("get",
             API.info_api(songlist_id,page,pagesize),
-            {"headers":Config.commonHeaders}
+            {"headers":SETTING.common_header}
             )

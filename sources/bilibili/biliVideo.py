@@ -1,8 +1,9 @@
-from sources.base import PictureSource, MediaSource, TextSource
+from apis import JsonResponseContainer, RegExpResponseContainer
+from sources.base import PictureSource, MediaSource, TextSource, CommonSource
 from sources.bilibili import BilibiliSource
-from utils.vhttp import httpGet, httpPost
 from utils.bilibili import videoIdConvertor
 from config import Config
+from apis.bilibili import video as videoApi
 import re, json
 
 
@@ -12,7 +13,8 @@ class biliVideo(BilibiliSource):
     patternAv = r"av[0-9]+"
     patternBv = r"BV[0-9,A-Z,a-z]+"
 
-    '''{'quality': 120, 'type': 'FLV', 'desc': '超清 4K'},'''
+    base_url = "https://www.bilibili.com/video/"
+
     qualities = [{'quality': 120, 'type': 'FLV', 'desc': '超清 4K',"cookie": True},
                  {'quality': 116, 'type': 'FLV', 'desc': '高清 1080P60', "cookie": True},
                  {'quality': 112, 'type': 'FLV', 'desc': '高清 1080P+', "cookie": True},
@@ -22,22 +24,6 @@ class biliVideo(BilibiliSource):
                  {'quality': 48, 'type': 'MP4', 'desc': '高清 720P (MP4)', "cookie": True},
                  {'quality': 32, 'type': 'FLV', 'desc': '清晰 480P', "cookie": False},
                  {'quality': 16, 'type': 'FLV', 'desc': '流畅 360P', "cookie": False}]
-
-    # videoUrl = "https://www.bilibili.com/video/av%s"
-    baseUrl = "https://www.bilibili.com/video/%s"
-    # pagesApi = "https://www.bilibili.com/widget/getPageList?aid=%s"
-    pagesApi = "https://api.bilibili.com/x/player/pagelist?bvid=%s"
-    detailApi = "https://api.bilibili.com/x/web-interface/view/detail?bvid=%s&aid=&jsonp=jsonp"
-    playurlApi = "https://api.bilibili.com/x/player/playurl?avid=&bvid=%s&cid=%s&qn=%s&type=&otype=json&fourk=1"
-    dmApi = "http://comment.bilibili.com/%s.xml"
-
-    extraHeaders = {"referer":"https://www.bilibili.com"}
-
-    @classmethod
-    def getHeader(cls,header):
-        tmp = header.copy()
-        tmp.update(cls.extraHeaders)
-        return tmp
 
     def __init__(self, bid):
         self.bid = bid
@@ -85,6 +71,7 @@ class biliVideo(BilibiliSource):
     def video(self):
         return self.getVideo()
 
+    @CommonSource.wrapper.handleException
     def getVideo(self, page=0, qn=116):
         if page == 0:
             page = self.currentPage
@@ -94,7 +81,7 @@ class biliVideo(BilibiliSource):
         url = urls[0]
         suffix = url.split("?")[0].split(".")[-1]
         return MediaSource(url,
-                           {"origin": "www.bilibili.com", "referer": self.baseUrl % self.bid,
+                           {"origin": "www.bilibili.com", "referer": self.base_url + self.bid,
                                          "user-agent": Config.commonHeaders["user-agent"]}
                            ,
                            self._parseTitle("video", page, suffix))
@@ -112,7 +99,7 @@ class biliVideo(BilibiliSource):
     def getDanmu(self, page=0):
         if page == 0:
             page = self.currentPage
-        return TextSource(self.dmApi % self._getPageCid(page),
+        return TextSource(videoApi.API.danmu_api(self._getPageCid(page)),
                           Config.commonHeaders,
                           self._parseTitle("danmu", page, "xml"),
                           "")
@@ -136,22 +123,20 @@ class biliVideo(BilibiliSource):
         return re.search(cls.patternAv, url) != None or re.search(cls.patternBv, url) != None
 
     def _getPages(self):
-        data = httpGet(self.pagesApi % self.bid)
-        if data == None or data.json()["code"] != 0:
-            return
-        self.pages = [{"page": d["page"], "pagename": d["part"], "cid": d["cid"]} for d in data.json()["data"]]
+        container = JsonResponseContainer(videoApi.getVideoCid(self.bid),
+                                          data="data")
+        self.pages = [{"page": d["page"], "pagename": d["part"], "cid": d["cid"]} for d in container.data["data"]]
 
+    @CommonSource.wrapper.handleException
     def load(self, **kwargs):
-        data = httpGet(self.detailApi % self.bid)
-        if data == None: return
-        data = data.json()
-        try:
-            self.title = data["data"]["View"]["title"]
-            self.uploader = data["data"]["View"]["owner"]["name"]
-            self.cover_url = data["data"]["View"]["pic"]
-            self._getPages()
-        except:
-            pass
+        container = JsonResponseContainer(videoApi.getVideoInfo(self.bid),
+                                          title = "data.View.title",
+                                          uploader = "data.View.owner.name",
+                                          cover = "data.View.pic")
+        self.title = container.data["title"]
+        self.uploader = container.data["uploader"]
+        self.cover_url = container.data["cover"]
+        self._getPages()
 
     def _getPageCid(self, page):
         cid = 0
@@ -174,13 +159,13 @@ class biliVideo(BilibiliSource):
         cid = self._getPageCid(page)
         if cid == 0:
             return quality
-        data = httpGet(self.playurlApi % (self.bid, cid, 32))
-        if data == None:
-            return quality
-        data = data.json()
-        formats = data["data"]["accept_format"].split(",")
-        for index, qn in enumerate(data["data"]["accept_quality"]):
-            quality[qn] = (formats[index], data["data"]["accept_description"][index])
+        container = JsonResponseContainer(videoApi.getPlayUrl(self.bid, cid, quality=32),
+                                          formats=("data.accept_format",
+                                                   lambda x:x.split(",")),
+                                          quality = "data.accept_quality",
+                                          desc = "data.accept_description")
+        for index, qn in enumerate(container.data["quality"]):
+            quality[qn] = (container.data["formats"][index], container.data["desc"][index])
         return quality
 
     def getBaseSources(self, page=0, qn=116,all=False,**kwargs):
@@ -199,14 +184,9 @@ class biliVideo(BilibiliSource):
         cid = self._getPageCid(page)
         if cid == 0:
             return []
-        data = httpGet(self.playurlApi % (self.bid, cid, qn), headers=self.getHeader(Config.commonHeaders),
-                       cookies=Config.getCookie("bilibili"))
-        if data == None:
-            return []
-        data = data.json()
-        if (data["code"] != 0):
-            return []
-        for u in data["data"]["durl"]:
+        container = JsonResponseContainer(videoApi.getPlayUrl(self.bid,cid,quality=qn),
+                                          durl = "data.durl")
+        for u in container.data["durl"]:
             urls.append(u["url"])
             if u["backup_url"] != None:
                 urls.append(u["backup_url"])
@@ -239,11 +219,9 @@ class biliBangumi(biliVideo):
     patterns = [r"ep[0-9]+",
                 r"ss[0-9]+"]
 
-    bangumiUrl = "https://www.bilibili.com/bangumi/play/%s"
-    playurlApi = "https://api.bilibili.com/pgc/player/web/playurl?avid=&bvid=%s&cid=%s&qn=%s&type=&otype=json&fourk=1"
-
-    def __init__(self, bid):
-        super(biliBangumi, self).__init__(bid)
+    def __init__(self, ep_id):
+        super(biliBangumi, self).__init__("")
+        self.ep_id = ep_id
 
     @property
     def info(self):
@@ -275,66 +253,57 @@ class biliBangumi(biliVideo):
 
 
     def _getQualities(self, page=1):
+
         quality = {}
         cid = self._getPageCid(page)
         if cid == 0:
             return quality
-        data = httpGet(self.playurlApi % (self.bid, cid, 32))
-        if data == None:
-            return quality
-        data = data.json()
-        formats = data["result"]["accept_format"].split(",")
-        for index, qn in enumerate(data["result"]["accept_quality"]):
-            quality[qn] = (formats[index], data["result"]["accept_description"][index])
+        container = JsonResponseContainer(videoApi.getBangumiPlayUrl(self.bid, cid, quality=32),
+                                          formats=("data.accept_format",
+                                                   lambda x: x.split(",")),
+                                          quality="data.accept_quality",
+                                          desc="data.accept_description")
+        for index, qn in enumerate(container.data["quality"]):
+            quality[qn] = (container.data["formats"][index], container.data["desc"][index])
         return quality
 
     def _getPlayurl(self, page, qn):
+
         urls = []
         cid = self._getPageCid(page)
         if cid == 0:
-            return urls
-
-        data = httpGet(self.playurlApi % (self.bid, cid, qn), headers=self.getHeader(Config.commonHeaders),
-                       cookies=Config.getCookie("bilibili"))
-        if data == None:
-            return urls
-        data = data.json()
-        if (data["code"] != 0):
-            return urls
-        for u in data["result"]["durl"]:
+            return []
+        container = JsonResponseContainer(videoApi.getBangumiPlayUrl(self.bid, cid, quality=qn),
+                                          durl="result.durl")
+        for u in container.data["durl"]:
             urls.append(u["url"])
             if u["backup_url"] != None:
                 urls.append(u["backup_url"])
         return urls
 
+    @CommonSource.wrapper.handleException
     def load(self, **kwargs):
-        if self.bid == "":
+        if self.ep_id == "":
             return
-        url = self.bangumiUrl % self.bid
-        rawhtml = httpGet(url)
-        if rawhtml == None:
-            return
-        try:
-            rawhtml = rawhtml.text
-            initial_state = json.loads(re.search(r"__INITIAL_STATE__={(.*?)]};", rawhtml).group()[18:-1])
-            self.title = initial_state["mediaInfo"]["title"]
-            self.cover_url = "https:" + initial_state["mediaInfo"]["cover"]
-            eplist = initial_state["epList"]
-            self.bid = eplist[0]["bvid"]
-            self.currentPage = 1
-            pages = []
-            epid = ""
-            if "ep" in url:
-                epid = str(re.search(r"ep[0-9]+", url).group()[2:])
-            for index, ep in enumerate(eplist, start=1):
-                pages.append(
-                    {"page": index, "pagename": "%s %s" % (ep["titleFormat"], ep["longTitle"]), "cid": ep["cid"]})
-                if epid == str(ep["id"]):
-                    self.currentPage = index
-            self.pages = pages
-        except Exception as e:
-            print(repr(e))
-            pass
+        container = RegExpResponseContainer(videoApi.getBangumiInfo(self.ep_id),
+                                            state = (r"__INITIAL_STATE__={(.*?)]};",
+                                                     lambda x:x[18:-1:]))
+        initial_state = json.loads(container.data["state"])
+        self.title = initial_state["mediaInfo"]["title"]
+        self.cover_url = "https:" + initial_state["mediaInfo"]["cover"]
+        eplist = initial_state["epList"]
+        self.bid = eplist[0]["bvid"]
+        self.currentPage = 1
+        pages = []
+        epid = ""
+        if "ep" in self.ep_id:
+            epid = str(re.search(r"ep[0-9]+", self.ep_id).group()[2:])
+        for index, ep in enumerate(eplist, start=1):
+            pages.append(
+                {"page": index, "pagename": "%s %s" % (ep["titleFormat"], ep["longTitle"]), "cid": ep["cid"]})
+            if epid == str(ep["id"]):
+                self.currentPage = index
+        self.pages = pages
 
     def _parseTitle(self, type, page, suffix):
         if (type == "video"):

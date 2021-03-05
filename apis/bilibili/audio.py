@@ -1,6 +1,4 @@
 from apis import CommonRequestWrapper, RegExpResponseContainer
-from config import Config
-from urllib import parse
 
 class QUALITY:
     HIGH = ("2","320k","高品质")

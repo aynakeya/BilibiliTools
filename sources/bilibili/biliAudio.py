@@ -126,8 +126,8 @@ class biliAudio(BilibiliSource,SearchableSource):
 
     def _getQualities(self):
         quality = {}
-        container = JsonResponseContainer(baudioApi.getAudioFile(self.sid, quality=quality),
-                                          qualities="data.cdns")
+        container = JsonResponseContainer(baudioApi.getAudioFile(self.sid, quality=2),
+                                          qualities="data.qualities")
         for q in container.data["qualities"]:
            quality[q["type"]] = (q["tag"], q["bps"] ,q["desc"])
         return quality

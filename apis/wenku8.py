@@ -1,4 +1,4 @@
-from apis import CommonRequestWrapper, RegExpResponseContainer
+from apis import CommonRequestWrapper, RegExpResponseContainer,SETTING
 from config import Config
 
 
@@ -16,7 +16,7 @@ class API:
 def getBookInfo(book_id: str):
     return ("get",
             API.info_api(book_id),
-            {"headers":Config.commonHeaders})
+            {"headers":SETTING.common_header})
 
 def getFileUrl(book_id: str):
     return API.downlaod_api(book_id)
